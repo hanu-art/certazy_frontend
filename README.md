@@ -213,8 +213,8 @@ certazy-frontend/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/your-username/certazy-frontend.git
-cd certazy-frontend
+git clone https://github.com/hanu-art/certazy_frontend.git
+
 
 # 2. Install dependencies
 npm install
