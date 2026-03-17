@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useDispatch } from "react-redux";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { logoutUser } from "@/features/auth/authSlice";
 import { STUDENT_MENU_ITEMS } from "./navbar.data";
 import { cn } from "@/lib/utils";

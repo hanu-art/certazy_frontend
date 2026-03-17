@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  *   onChange → dispatch(setSearchQuery(value))
  *   useDebounce hook lagao — GET /api/v1/courses?search=
  */
-export default function SearchBar({ className }) {
+export default function Searchbar({ className }) {
     const [focused, setFocused] = useState(false);
 
     return (

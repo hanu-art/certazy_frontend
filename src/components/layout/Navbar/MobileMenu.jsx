@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, Loader2 } from "lucide-react";
 import categoryService from "@/services/categoryService";
-import SearchBar from "./SearchBar";
+import Searchbar from "./Searchbar ";
 import { MORE_ITEMS, STUDENT_MENU_ITEMS } from "./navbar.data";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +42,7 @@ export default function MobileMenu({ isLoggedIn, user, onClose }) {
 
                 {/* Search */}
                 <div className="pb-3">
-                    <SearchBar className="max-w-full" />
+                    <Searchbar className="max-w-full" />
                 </div>
 
                 {/* Categories accordion */}

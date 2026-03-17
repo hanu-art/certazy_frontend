@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Info, Mail, HelpCircle, BookOpen } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,14 +7,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MORE_ITEMS } from "./navbar.data";
 import { cn } from "@/lib/utils";
 
-/**
- * NavLinks.jsx
- * Desktop nav — More dropdown only
- * "All Courses" button alag hai index.jsx mein (MegaMenu trigger)
- */
+// ── Icons for each item ───────────────────────────────────
+const MORE_ITEMS = [
+    { label: "About Us", to: "/about", icon: Info, desc: "Our story and mission" },
+    { label: "Contact", to: "/contact", icon: Mail, desc: "Get in touch with us" },
+    { label: "Blog", to: "/blog", icon: BookOpen, desc: "Tips, guides and resources" },
+    { divider: true },
+    { label: "Help Center", to: "/help", icon: HelpCircle, desc: "FAQs and support" },
+];
+
 export default function NavLinks() {
     return (
         <nav className="hidden md:flex items-center gap-6">
@@ -35,7 +38,7 @@ export function NavLink({ label, to }) {
             )}
         >
             {label}
-            <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary rounded-full transition-all duration-200 group-hover:w-full" />
+            <span className="absolute bottom-0  left-0 h-[2px] w-0 bg-primary rounded-full transition-all duration-200 group-hover:w-full" />
         </Link>
     );
 }
@@ -60,7 +63,7 @@ function MoreDropdown() {
 
             <DropdownMenuContent
                 align="start"
-                className="min-w-[180px] rounded-lg shadow-drop border-border p-1"
+                className="w-[220px] rounded-lg shadow-drop border-border p-1.5"
             >
                 {MORE_ITEMS.map((item, i) =>
                     item.divider ? (
@@ -69,9 +72,32 @@ function MoreDropdown() {
                         <DropdownMenuItem key={i} asChild>
                             <Link
                                 to={item.to}
-                                className="text-[13.5px] font-medium text-text-primary cursor-pointer w-full rounded"
+                                className={cn(
+                                    "flex items-start gap-3 px-3 py-2.5 rounded cursor-pointer",
+                                    "hover:bg-primary-light group transition-colors duration-150",
+                                    "outline-none focus:bg-primary-light"
+                                )}
                             >
-                                {item.label}
+                                {/* Icon */}
+                                <div className={cn(
+                                    "w-7 h-7 rounded flex items-center justify-center shrink-0 mt-0.5",
+                                    "bg-page group-hover:bg-white transition-colors duration-150"
+                                )}>
+                                    <item.icon
+                                        size={14}
+                                        className="text-text-muted group-hover:text-primary transition-colors duration-150"
+                                    />
+                                </div>
+
+                                {/* Label + desc */}
+                                <div>
+                                    <p className="text-[13.5px] font-semibold text-text-primary group-hover:text-primary transition-colors duration-150">
+                                        {item.label}
+                                    </p>
+                                    <p className="text-[12px] text-text-muted mt-0.5 leading-tight">
+                                        {item.desc}
+                                    </p>
+                                </div>
                             </Link>
                         </DropdownMenuItem>
                     )

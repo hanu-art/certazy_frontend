@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "@/components/layout/Navbar";
+import NavBarIndex from "./components/layout/Navbar/NavBarIndex";
 const App = () => {
   return (
     <div>
-      <Navbar />
+      <NavBarIndex />
     </div>
   );
 };
