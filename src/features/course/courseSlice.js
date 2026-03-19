@@ -4,30 +4,41 @@ import courseService from "@/services/courseService";
 /**
  * courseSlice.js
  *
- * Global course state — CoursesPage reads from here.
- *
- * State:
- *   courses     → fetched courses list
- *   pagination  → total, page, limit, totalPages
- *   filters     → category, level, search, sort
- *   loading     → API call in progress
- *   error       → error message
+ * Filters:
+ *   category_id → number (backend expects category_id)
+ *   level       → "beginner" | "intermediate" | "advanced"
+ *   search      → string
+ *   sort        → "newest" | "popular" | "price_low" | "price_high" | "rating"
  */
+
+const SORT_MAP = {
+    newest: { sortBy: "created_at", sortOrder: "DESC" },
+    popular: { sortBy: "enrolled_count", sortOrder: "DESC" },
+    price_low: { sortBy: "price", sortOrder: "ASC" },
+    price_high: { sortBy: "price", sortOrder: "DESC" },
+    rating: { sortBy: "rating_avg", sortOrder: "DESC" },
+};
 
 // ─────────────────────────────────────────────
 // ASYNC THUNK
 // ─────────────────────────────────────────────
-
-// GET /api/v1/courses?status=published&page=1&limit=12&...
 export const fetchCourses = createAsyncThunk(
     "course/fetchAll",
     async (params = {}, { rejectWithValue }) => {
         try {
+            // Sort mapping — frontend value → backend params
+            if (params.sort && SORT_MAP[params.sort]) {
+                const { sortBy, sortOrder } = SORT_MAP[params.sort];
+                params.sortBy = sortBy;
+                params.sortOrder = sortOrder;
+                delete params.sort;
+            }
+
             const { data } = await courseService.getAll({
                 status: "published",
                 ...params,
             });
-            return data; // { data: [...], pagination: {...} }
+            return data;
         } catch (err) {
             return rejectWithValue(
                 err.response?.data?.message || "Failed to fetch courses"
@@ -35,7 +46,6 @@ export const fetchCourses = createAsyncThunk(
         }
     }
 );
-
 // ─────────────────────────────────────────────
 // SLICE
 // ─────────────────────────────────────────────
@@ -51,27 +61,25 @@ const courseSlice = createSlice({
             totalPages: 0,
         },
         filters: {
-            category: null,  // category slug from URL — e.g. "amazon-aws"
-            level: null,  // "beginner" | "intermediate" | "advanced"
-            search: null,  // search query string
-            sort: null,  // "newest" | "price_high" | "price_low" | "rating"
+            category_id: null, // number — backend expects category_id
+            level: null, // "beginner" | "intermediate" | "advanced"
+            search: null, // search query string
+            sort: null, // sort option
         },
         loading: false,
         error: null,
     },
 
     reducers: {
-        // Set individual filter — triggers new fetch from component
         setFilter: (state, action) => {
             const { key, value } = action.payload;
             state.filters[key] = value;
-            state.pagination.page = 1; // reset to page 1 on filter change
+            state.pagination.page = 1;
         },
 
-        // Clear all filters
         clearFilters: (state) => {
             state.filters = {
-                category: null,
+                category_id: null,
                 level: null,
                 search: null,
                 sort: null,
@@ -79,12 +87,10 @@ const courseSlice = createSlice({
             state.pagination.page = 1;
         },
 
-        // Set page
         setPage: (state, action) => {
             state.pagination.page = action.payload;
         },
 
-        // Clear error
         clearError: (state) => {
             state.error = null;
         },

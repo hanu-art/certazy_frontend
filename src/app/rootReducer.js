@@ -1,5 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import authReducer from "@/features/auth/authSlice";
+import courseReducer from "@/features/course/courseSlice";
 
 /**
  * rootReducer.js
@@ -19,12 +20,7 @@ import authReducer from "@/features/auth/authSlice";
 
 const rootReducer = combineReducers({
     auth: authReducer,
-
-    // Aage yahan add karte jayenge:
-    // category:     categoryReducer,
-    // course:       courseReducer,
-    // cart:         cartReducer,
-    // notification: notificationReducer,
+    course: courseReducer
 });
 
 export default rootReducer;
