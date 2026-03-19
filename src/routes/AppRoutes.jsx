@@ -8,7 +8,7 @@ import NavBarIndex from "@/components/layout/Navbar/NavBarIndex";
 
 // Public pages
 import CoursesPage from "@/pages/public/Courses/CoursesPage"
-
+import CourseDetailPage from "@/pages/public/CourseDetail/CourseDetailIndex"
 /**
  * AppRoutes.jsx
  *
@@ -31,6 +31,7 @@ export default function AppRoutes() {
                 <Route path="/" element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
                 <Route path="/courses" element={<CoursesPage />} />
 
+                <Route path="/courses/:slug" element={<CourseDetailPage />} />
                 {/* ── 404 ── */}
                 <Route path="*" element={
                     <div className="min-h-screen flex items-center justify-center">
