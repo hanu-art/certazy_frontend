@@ -22,4 +22,3 @@ dist
 # Docker files themselves
 Dockerfile*
 docker-compose*
-nginx.conf
