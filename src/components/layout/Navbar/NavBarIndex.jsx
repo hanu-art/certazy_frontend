@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { LayoutGrid, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import { selectIsLoggedIn, selectUser } from "@/features/auth/authSlice";
 import Searchbar from "./Searchbar ";
@@ -19,64 +19,42 @@ function NavBarIndex() {
     const isLoggedIn = useSelector(selectIsLoggedIn);
     const user = useSelector(selectUser);
 
-    const toggleMega = () => {
-        setMegaOpen((p) => !p);
-        setMobileOpen(false);
-    };
-
-    const toggleMobile = () => {
-        setMobileOpen((p) => !p);
-        setMegaOpen(false);
-    };
-
+    const toggleMega = () => { setMegaOpen((p) => !p); setMobileOpen(false); };
+    const toggleMobile = () => { setMobileOpen((p) => !p); setMegaOpen(false); };
     const closeMega = () => setMegaOpen(false);
     const closeMobile = () => setMobileOpen(false);
 
     return (
         <>
-            <header className="sticky top-0 z-40 bg-white border-b border-border shadow-navbar">
-                <div className="max-w-[1280px] mx-auto px-6 h-[72px] flex items-center gap-4 md:gap-8">
+            <header className="sticky top-0 z-40 bg-white border-b border-border">
+                <div className="max-w-[1280px] mx-auto px-6 h-[60px] flex items-center">
 
-                    {/* LEFT */}
-                    <div className="flex items-center gap-4 shrink-0">
-                        <Logo />
-                        <AllCoursesBtn isOpen={megaOpen} onClick={toggleMega} />
+                    {/* Logo */}
+                    <Logo />
+
+                    {/* Nav links — logo ke baad, gap-8 between links */}
+                    <div className="hidden md:block ml-8">
+                        <NavLinks megaOpen={megaOpen} onToggleMega={toggleMega} />
                     </div>
 
-                    {/* CENTER SEARCH */}
-                    <div className="hidden md:flex flex-1 justify-center">
-                        <div className="w-[340px]">
+                    {/* ml-auto — right group ko right side push karta hai
+                        gap between More and Search = jo bhi bachi jagah hai,
+                        not forced flex-1 */}
+                    <div className="hidden md:flex items-center gap-3 ml-auto">
+                        <div className="w-[200px] lg:w-[230px]">
                             <Searchbar />
-                        </div>
-                    </div>
-
-                    {/* RIGHT */}
-                    <div className="flex items-center gap-4 shrink-0 ml-auto">
-
-                        <div className="hidden md:block">
-                            <NavLinks />
                         </div>
 
                         {isLoggedIn && user ? (
                             <>
                                 <Link
                                     to="/student/my-courses"
-                                    className={cn(
-                                        "hidden md:block",
-                                        "text-[14px] font-medium text-text-secondary",
-                                        "hover:text-primary transition-colors duration-200"
-                                    )}
+                                    className="hidden lg:block text-[13.5px] font-medium text-text-secondary hover:text-primary transition-colors whitespace-nowrap"
                                 >
                                     My Learning
                                 </Link>
-
-                                <div className="hidden md:block">
-                                    <NotificationBell unreadCount={user.unreadCount ?? 0} />
-                                </div>
-
-                                <div className="hidden md:block">
-                                    <AvatarMenu user={user} />
-                                </div>
+                                <NotificationBell unreadCount={user.unreadCount ?? 0} />
+                                <AvatarMenu user={user} />
                             </>
                         ) : (
                             <>
@@ -84,30 +62,24 @@ function NavBarIndex() {
                                 <RegisterBtn />
                             </>
                         )}
-
-                        {/* Mobile menu */}
-                        <button
-                            onClick={toggleMobile}
-                            className={cn(
-                                "md:hidden flex items-center justify-center",
-                                "w-9 h-9 rounded border border-border",
-                                "text-text-secondary",
-                                "hover:text-primary hover:border-primary",
-                                "transition-colors duration-200"
-                            )}
-                        >
-                            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-                        </button>
-
                     </div>
+
+                    {/* Mobile hamburger */}
+                    <button
+                        onClick={toggleMobile}
+                        aria-label="Toggle menu"
+                        className={cn(
+                            "md:hidden flex items-center justify-center ml-auto",
+                            "w-8 h-8 rounded text-text-secondary",
+                            "hover:text-primary hover:bg-primary-light transition-colors duration-200"
+                        )}
+                    >
+                        {mobileOpen ? <X size={19} /> : <Menu size={19} />}
+                    </button>
                 </div>
 
                 {mobileOpen && (
-                    <MobileMenu
-                        isLoggedIn={isLoggedIn}
-                        user={user}
-                        onClose={closeMobile}
-                    />
+                    <MobileMenu isLoggedIn={isLoggedIn} user={user} onClose={closeMobile} />
                 )}
             </header>
 
@@ -118,44 +90,18 @@ function NavBarIndex() {
 
 function Logo() {
     return (
-        <Link to="/" className="flex items-center gap-2 shrink-0 no-underline mr-2">
-            <div className="w-[30px] h-[30px] rounded bg-primary flex items-center justify-center shrink-0">
-                <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
+        <Link to="/" className="flex items-center gap-2 shrink-0 no-underline">
+            <div className="w-[28px] h-[28px] rounded bg-primary flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                    stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                     <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
             </div>
-
-            <span className="text-[17px] font-extrabold text-text-primary tracking-tight">
+            <span className="text-[16px] font-extrabold text-text-primary tracking-tight">
                 Cert<span className="text-primary">azy</span>
             </span>
         </Link>
-    );
-}
-
-function AllCoursesBtn({ isOpen, onClick }) {
-    return (
-        <button
-            onClick={onClick}
-            className={cn(
-                "flex items-center gap-1.5 h-9 px-4.5 rounded shrink-0",
-                "text-[13.5px] font-semibold text-white font-sans",
-                "transition-colors duration-200",
-                isOpen ? "bg-primary-hover" : "bg-primary hover:bg-primary-hover"
-            )}
-        >
-            <LayoutGrid size={14} />
-            All Courses
-        </button>
     );
 }
 
@@ -163,15 +109,9 @@ function LoginBtn() {
     return (
         <Link
             to="/login"
-            className={cn(
-                "hidden md:flex items-center h-9 px-5 rounded shrink-0",
-                "border-[1.5px] border-border",
-                "text-[13.5px] font-semibold text-text-primary",
-                "hover:border-primary hover:text-primary",
-                "transition-colors duration-200"
-            )}
+            className="text-[13.5px] font-medium text-text-secondary hover:text-primary transition-colors duration-200 whitespace-nowrap"
         >
-            Login
+            Log In
         </Link>
     );
 }
@@ -181,13 +121,13 @@ function RegisterBtn() {
         <Link
             to="/register"
             className={cn(
-                "hidden md:flex items-center h-9 px-5 rounded shrink-0",
+                "flex items-center h-[34px] px-5 rounded shrink-0",
                 "bg-primary hover:bg-primary-hover",
                 "text-[13.5px] font-semibold text-white",
-                "transition-colors duration-200"
+                "transition-colors duration-200 whitespace-nowrap"
             )}
         >
-            Register
+            Sign Up
         </Link>
     );
 }
