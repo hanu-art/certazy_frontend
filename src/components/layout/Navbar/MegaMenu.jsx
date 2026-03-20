@@ -116,6 +116,8 @@ export default function MegaMenu({ onClose }) {
 }
 
 // ── Single category card ──────────────────────────────────
+
+// ── Single category card ──────────────────────────────────
 function CategoryCard({ category, onClose }) {
     const visibleChildren = category.children?.slice(0, 4) || [];
 
@@ -124,11 +126,10 @@ function CategoryCard({ category, onClose }) {
 
             {/* Category header — icon + name */}
             <Link
-                to={`/courses?category=${category.slug}`}
+                to={`/courses?category_id=${category.id}`}  // ✅ FIXED
                 onClick={onClose}
                 className="flex items-center gap-2 mb-2"
             >
-                {/* Icon */}
                 <div className={cn(
                     "w-7 h-7 rounded flex items-center justify-center shrink-0",
                     "bg-primary-light group-hover:bg-primary transition-colors duration-200"
@@ -136,13 +137,11 @@ function CategoryCard({ category, onClose }) {
                     <CategoryIcon slug={category.slug} />
                 </div>
 
-                {/* Name */}
                 <span className="text-[13.5px] font-bold text-text-primary group-hover:text-primary transition-colors duration-200">
                     {category.name}
                 </span>
             </Link>
 
-            {/* Divider */}
             <div className="h-px bg-border mb-2" />
 
             {/* Children */}
@@ -151,7 +150,7 @@ function CategoryCard({ category, onClose }) {
                     {visibleChildren.map((child) => (
                         <li key={child.id}>
                             <Link
-                                to={`/courses?category=${child.slug}`}
+                                to={`/courses?category_id=${child.id}`}  // ✅ FIXED
                                 onClick={onClose}
                                 className={cn(
                                     "block px-1.5 py-1 rounded text-[12.5px]",
@@ -172,7 +171,7 @@ function CategoryCard({ category, onClose }) {
 
             {/* More → */}
             <Link
-                to={`/courses?category=${category.slug}`}
+                to={`/courses?category_id=${category.id}`}  // ✅ FIXED
                 onClick={onClose}
                 className="flex items-center gap-1 px-1.5 text-[12px] font-semibold text-primary hover:text-primary-hover transition-colors"
             >
@@ -181,6 +180,7 @@ function CategoryCard({ category, onClose }) {
         </div>
     );
 }
+
 
 // ── Category icons — lucide based on slug ────────────────
 function CategoryIcon({ slug }) {
