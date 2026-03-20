@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Menu, X } from "lucide-react";
 
 import { selectIsLoggedIn, selectUser } from "@/features/auth/authSlice";
-import Searchbar from "./Searchbar ";
+import Searchbar from "./Searchbar";
 import NavLinks from "./NavLinks";
 import MegaMenu from "./MegaMenu";
 import NotificationBell from "./NotificationBell";

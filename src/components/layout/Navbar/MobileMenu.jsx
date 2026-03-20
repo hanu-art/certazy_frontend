@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, Loader2, BookOpen, LayoutGrid } from "lucide-react";
 import categoryService from "@/services/categoryService";
-import Searchbar from "./Searchbar ";
+import Searchbar from "./Searchbar";
 import { MORE_ITEMS, STUDENT_MENU_ITEMS } from "./navbar.data";
 import { cn } from "@/lib/utils";
 
