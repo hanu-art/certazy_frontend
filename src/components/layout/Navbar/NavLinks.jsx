@@ -21,8 +21,8 @@ export default function NavLinks({ megaOpen, onToggleMega }) {
     const { pathname } = useLocation();
 
     return (
-        // gap-8 — links ke beech proper spacing, screenshot jaisa
-        <nav className="flex items-center gap-8">
+        
+        <nav className="flex items-center gap-10">
             <NavLink to="/" label="Home" isActive={pathname === "/"} />
             <AllCoursesLink isOpen={megaOpen} onClick={onToggleMega} />
             <MoreDropdown />
@@ -36,7 +36,7 @@ function NavLink({ to, label, isActive }) {
         <Link
             to={to}
             className={cn(
-                "relative flex items-center h-[60px]",
+                "relative flex items-center h-[70px]",
                 "text-[13.5px] font-medium transition-colors duration-200 group whitespace-nowrap",
                 isActive ? "text-primary" : "text-text-secondary hover:text-primary"
             )}
@@ -90,7 +90,7 @@ function MoreDropdown() {
                 </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" className="w-[220px] rounded-lg shadow-drop border-border p-1.5">
+            <DropdownMenuContent align="start" className="w-[220px]  rounded-lg shadow-drop border-border p-1.5">
                 {MORE_ITEMS.map((item, i) =>
                     item.divider ? (
                         <DropdownMenuSeparator key={i} className="bg-border my-1" />

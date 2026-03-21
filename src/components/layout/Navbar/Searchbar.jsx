@@ -110,7 +110,7 @@ export default function SearchBar({ className }) {
             {/* ── Dropdown ── */}
             {dropOpen && (
                 <div
-                    className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-xl overflow-hidden z-50 border border-border"
+                    className="absolute top-[calc(100%+20px)] left-0 right-0 bg-white rounded-xl overflow-hidden z-50 border border-border"
                     style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}
                 >
                     {results.length > 0 ? (

@@ -27,7 +27,7 @@ function NavBarIndex() {
     return (
         <>
             <header className="sticky top-0 z-40 bg-white border-b border-border">
-                <div className="max-w-[1280px] mx-auto px-6 h-[60px] flex items-center">
+                <div className="max-w-[1280px] mx-auto px-6 h-[70px] flex items-center">
 
                     {/* Logo */}
                     <Logo />
@@ -40,8 +40,8 @@ function NavBarIndex() {
                     {/* ml-auto — right group ko right side push karta hai
                         gap between More and Search = jo bhi bachi jagah hai,
                         not forced flex-1 */}
-                    <div className="hidden md:flex items-center gap-3 ml-auto">
-                        <div className="w-[200px] lg:w-[230px]">
+                    <div className="hidden md:flex items-center gap-5 ml-auto">
+                    <div className="w-[180px] md:w-[220px] lg:w-[420px]">
                             <Searchbar />
                         </div>
 
