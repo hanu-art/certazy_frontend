@@ -3,43 +3,38 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
     Star, Users, BookOpen, Award,
-    ChevronRight, CheckCircle, Clock
+    ChevronRight, CheckCircle, GraduationCap,
 } from "lucide-react";
 
-import courseService from "@/services/courseService";
-import sectionService from "@/services/sectionService";
-import { selectIsLoggedIn } from "@/features/auth/authSlice";
+import courseService   from "@/services/courseService";
+import sectionService  from "@/services/sectionService";
+import { selectIsLoggedIn, selectUser } from "@/features/auth/authSlice";
 
 import CourseCurriculum from "./CourseCurriculum";
 import CourseEnrollCard from "./CourseEnrollCard";
-import { cn } from "@/lib/utils";
+import { cn }           from "@/lib/utils";
 
-/**
- * CourseDetailPage — index.jsx
- * Route: /courses/:slug
- */
 export default function CourseDetailIndex() {
-    const { slug } = useParams();
-    const navigate = useNavigate();
+    const { slug }   = useParams();
+    const navigate   = useNavigate();
     const isLoggedIn = useSelector(selectIsLoggedIn);
+    const user       = useSelector(selectUser);
 
-    const [course, setCourse] = useState(null);
+    const [course,   setCourse]   = useState(null);
     const [sections, setSections] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [loading,  setLoading]  = useState(true);
+    const [error,    setError]    = useState(null);
 
-    const isEnrolled = false;
+    const isEnrolled = user?.enrolled_courses?.includes(course?.id) ?? false;
 
-    // ── Fetch course + sections ──────────────────────────
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
                 const { data: cd } = await courseService.getBySlug(slug);
-                const course = cd.data.course;
-                setCourse(course);
-
-                const { data: sd } = await sectionService.getByCourseId(course.id);
+                const c = cd.data.course;
+                setCourse(c);
+                const { data: sd } = await sectionService.getByCourseId(c.id);
                 setSections(sd.data.sections);
             } catch (err) {
                 setError(err.response?.data?.message || "Course not found");
@@ -59,12 +54,13 @@ export default function CourseDetailIndex() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center"
-                style={{ background: "linear-gradient(180deg, #EBF4FB 0%, #F8F9FA 100%)" }}>
-                <div className="text-center">
+            <div className="min-h-screen flex items-center justify-center bg-[#F1F5F9]">
+                <div className="text-center px-4">
                     <p className="text-[16px] font-semibold text-text-primary mb-3">{error}</p>
-                    <button onClick={() => navigate("/courses")}
-                        className="text-[14px] font-medium text-primary hover:text-primary-hover transition-colors">
+                    <button
+                        onClick={() => navigate("/courses")}
+                        className="text-[14px] font-semibold text-primary hover:text-primary-hover transition-colors"
+                    >
                         ← Back to courses
                     </button>
                 </div>
@@ -72,23 +68,30 @@ export default function CourseDetailIndex() {
         );
     }
 
-    // Parse what_you_learn — newline separated string
     const whatYouLearn = course.what_you_learn
         ? course.what_you_learn.split("\n").filter(Boolean)
         : [];
 
     return (
-        <div className="min-h-screen"
-            style={{ background: "linear-gradient(180deg, #EBF4FB 0%, #F8F9FA 100%)" }}>
+        <div className="min-h-screen bg-[#F1F5F9]">
 
-            {/* ── Hero Banner ── */}
-            <div style={{ background: "linear-gradient(135deg, #0a2540 0%, #1a3a6c 60%, #1e4d8c 100%)" }}>
-                <div className="max-w-[1280px] mx-auto px-6 py-14">
-                    <div className="max-w-[720px]">
+            {/* ── Hero ──────────────────────────────────────── */}
+            <div style={{
+                background: "linear-gradient(135deg, #0a1628 0%, #0f2545 55%, #162d5a 100%)",
+                position: "relative", overflow: "hidden",
+            }}>
+                <div style={{
+                    position: "absolute", inset: 0, opacity: 0.04,
+                    backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)",
+                    backgroundSize: "26px 26px", pointerEvents: "none",
+                }} />
+
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-12 lg:py-16 relative">
+                    <div className="lg:max-w-[calc(100%-360px)]">
 
                         {/* Breadcrumb */}
-                        <div className="flex items-center gap-1.5 text-[12px] mb-5 flex-wrap"
-                            style={{ color: "rgba(255,255,255,0.45)" }}>
+                        <div className="flex items-center gap-1.5 mb-5 flex-wrap"
+                            style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>
                             <span className="hover:text-white cursor-pointer transition-colors"
                                 onClick={() => navigate("/courses")}>
                                 Courses
@@ -99,92 +102,81 @@ export default function CourseDetailIndex() {
                                 {course.category_name}
                             </span>
                             <ChevronRight size={11} />
-                            <span style={{ color: "rgba(255,255,255,0.65)" }} className="truncate max-w-[300px]">
+                            <span className="truncate max-w-[200px] sm:max-w-[400px]"
+                                style={{ color: "rgba(255,255,255,0.6)" }}>
                                 {course.title}
                             </span>
                         </div>
 
                         {/* Category badge */}
-                        <span className="inline-flex items-center text-[11px] font-bold uppercase tracking-wider mb-5 px-3 py-1.5 rounded-full"
-                            style={{ background: "rgba(255,255,255,0.12)", color: "#5eb8ff" }}>
+                        <span className="inline-flex items-center text-[11px] font-bold uppercase tracking-wider mb-4 px-3 py-1.5 rounded-full"
+                            style={{ background: "rgba(255,255,255,0.10)", color: "#60A5FA", border: "1px solid rgba(255,255,255,0.10)" }}>
                             {course.category_name}
                         </span>
 
                         {/* Title */}
-                        <h1 className="text-[30px] font-extrabold text-white leading-tight mb-4 tracking-tight">
+                        <h1 style={{
+                            fontSize: "clamp(22px, 3vw, 32px)",
+                            fontWeight: 800, color: "#fff",
+                            lineHeight: 1.22, letterSpacing: "-0.02em", marginBottom: "14px",
+                        }}>
                             {course.title}
                         </h1>
 
                         {/* Short desc */}
                         {course.short_desc && (
-                            <p className="text-[15px] mb-6 leading-relaxed max-w-[600px]"
-                                style={{ color: "rgba(255,255,255,0.72)" }}>
+                            <p style={{
+                                fontSize: "15px", fontWeight: 400,
+                                color: "rgba(255,255,255,0.62)",
+                                lineHeight: 1.65, marginBottom: "22px", maxWidth: "600px",
+                            }}>
                                 {course.short_desc}
                             </p>
                         )}
 
                         {/* Stats */}
-                        <div className="flex items-center gap-5 flex-wrap">
-                            {/* Rating */}
+                        <div className="flex items-center gap-4 flex-wrap">
                             <div className="flex items-center gap-1.5">
                                 <div className="flex items-center gap-0.5">
                                     {Array(5).fill(0).map((_, i) => (
-                                        <Star key={i} size={13}
+                                        <Star key={i} size={12}
                                             className={cn(
                                                 i < Math.round(course.rating_avg || 0)
-                                                    ? "text-yellow-400 fill-yellow-400"
-                                                    : "text-white/20 fill-white/20"
-                                            )}
-                                        />
+                                                    ? "text-amber-400 fill-amber-400"
+                                                    : "fill-white/20 text-white/20"
+                                            )} />
                                     ))}
                                 </div>
-                                <span className="text-[13px] font-semibold text-white">
+                                <span style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}>
                                     {course.rating_avg > 0 ? Number(course.rating_avg).toFixed(1) : "New"}
                                 </span>
                                 {course.rating_count > 0 && (
-                                    <span className="text-[12px]" style={{ color: "rgba(255,255,255,0.45)" }}>
-                                        ({course.rating_count})
+                                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)" }}>
+                                        ({course.rating_count.toLocaleString()})
                                     </span>
                                 )}
                             </div>
-
                             {course.enrolled_count > 0 && (
-                                <div className="flex items-center gap-1.5"
-                                    style={{ color: "rgba(255,255,255,0.65)" }}>
-                                    <Users size={13} />
-                                    <span className="text-[13px]">
-                                        {course.enrolled_count.toLocaleString()} students
-                                    </span>
-                                </div>
+                                <StatPill icon={Users} label={`${course.enrolled_count.toLocaleString()} students`} />
                             )}
-
                             {sections.length > 0 && (
-                                <div className="flex items-center gap-1.5"
-                                    style={{ color: "rgba(255,255,255,0.65)" }}>
-                                    <BookOpen size={13} />
-                                    <span className="text-[13px]">{sections.length} sections</span>
-                                </div>
+                                <StatPill icon={BookOpen} label={`${sections.length} sections`} />
                             )}
-
                             {course.certificate_eligible === 1 && (
-                                <div className="flex items-center gap-1.5"
-                                    style={{ color: "rgba(255,255,255,0.65)" }}>
-                                    <Award size={13} />
-                                    <span className="text-[13px]">Certificate</span>
-                                </div>
+                                <StatPill icon={Award} label="Certificate" />
                             )}
                         </div>
 
-                        {/* Instructor */}
+                        {/* Instructor — hero mein sirf naam */}
                         {course.instructor_name && (
-                            <div className="flex items-center gap-2 mt-5">
-                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
-                                    style={{ background: "rgba(255,255,255,0.15)" }}>
+                            <div className="flex items-center gap-2.5 mt-5">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0"
+                                    style={{ background: "rgba(255,255,255,0.12)" }}>
                                     {course.instructor_name.charAt(0).toUpperCase()}
                                 </div>
-                                <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.6)" }}>
+                                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>
                                     Instructor:{" "}
-                                    <span className="text-white font-semibold">
+                                    <span style={{ color: "#fff", fontWeight: 600 }}>
                                         {course.instructor_name}
                                     </span>
                                 </p>
@@ -194,48 +186,51 @@ export default function CourseDetailIndex() {
                 </div>
             </div>
 
-            {/* ── Main Content ── */}
-            <div className="max-w-[1280px] mx-auto px-6 py-8">
-                <div className="flex gap-8 items-start">
+            {/* ── Main Content ──────────────────────────────── */}
+            <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-8">
+                <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-                    {/* Left */}
-                    <div className="flex-1 min-w-0 space-y-5">
+                    {/* ── LEFT ── */}
+                    <div className="w-full lg:flex-1 lg:min-w-0 space-y-5">
 
                         {/* What you'll learn */}
                         {whatYouLearn.length > 0 && (
-                            <SectionCard title="What You'll Learn">
-                                <div className="grid grid-cols-2 gap-3">
+                            <ContentCard title="What You'll Learn">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {whatYouLearn.map((item, i) => (
                                         <div key={i} className="flex items-start gap-2.5">
                                             <CheckCircle size={15} className="text-primary shrink-0 mt-0.5" />
-                                            <span className="text-[13.5px] text-text-secondary leading-relaxed">
+                                            <span style={{ fontSize: "13.5px", color: "#475569", lineHeight: 1.6 }}>
                                                 {item}
                                             </span>
                                         </div>
                                     ))}
                                 </div>
-                            </SectionCard>
+                            </ContentCard>
                         )}
 
                         {/* About */}
                         {course.description && (
-                            <SectionCard title="About this Course">
-                                <p className="text-[14px] text-text-secondary leading-relaxed whitespace-pre-line">
+                            <ContentCard title="About this Course">
+                                <p style={{
+                                    fontSize: "14px", color: "#475569",
+                                    lineHeight: 1.75, whiteSpace: "pre-line",
+                                }}>
                                     {course.description}
                                 </p>
-                            </SectionCard>
+                            </ContentCard>
                         )}
 
                         {/* Curriculum */}
-                        <SectionCard title="Curriculum">
-                            <div className="flex items-center gap-3 mb-4 flex-wrap">
-                                <span className="text-[13px] text-text-muted">
+                        <ContentCard title="Curriculum">
+                            <div className="flex items-center gap-2 mb-5 flex-wrap">
+                                <span style={{ fontSize: "13px", color: "#94A3B8" }}>
                                     {sections.length} sections
                                 </span>
                                 {course.total_lessons > 0 && (
                                     <>
-                                        <span className="text-text-muted">•</span>
-                                        <span className="text-[13px] text-text-muted">
+                                        <span style={{ color: "#E2E8F0" }}>•</span>
+                                        <span style={{ fontSize: "13px", color: "#94A3B8" }}>
                                             {course.total_lessons} lessons
                                         </span>
                                     </>
@@ -246,38 +241,126 @@ export default function CourseDetailIndex() {
                                 courseId={course.id}
                                 isEnrolled={isEnrolled}
                             />
-                        </SectionCard>
+                        </ContentCard>
+
+                        {/* ── Instructor Section ─────────────────────
+                            Backend se jo fields aate hain unhi se banaya:
+                            instructor_name — hamesha hota hai
+                            instructor_bio  — optional, agar nahi aata toh section nahi dikhega
+                            instructor_avatar — optional, nahi toh initials
+                            instructor_rating, instructor_students, instructor_courses — optional stats
+                        ── */}
+                        {course.instructor_name && (
+                            <ContentCard title="Your Instructor">
+                                <div className="flex items-start gap-4">
+
+                                    {/* Avatar — photo ya initials */}
+                                    {course.instructor_avatar ? (
+                                        <img
+                                            src={course.instructor_avatar}
+                                            alt={course.instructor_name}
+                                            className="w-16 h-16 rounded-2xl object-cover shrink-0"
+                                            style={{ border: "2px solid #EEF2F7" }}
+                                        />
+                                    ) : (
+                                        <div
+                                            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 text-white font-bold text-[18px]"
+                                            style={{ background: "linear-gradient(135deg, #3282B8, #0a1628)" }}
+                                        >
+                                            {course.instructor_name.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+
+                                    <div className="flex-1 min-w-0">
+                                        {/* Name */}
+                                        <p style={{ fontSize: "16px", fontWeight: 700, color: "#0F172A", marginBottom: "4px" }}>
+                                            {course.instructor_name}
+                                        </p>
+
+                                        {/* Role / title — agar backend se aaye */}
+                                        {course.instructor_title && (
+                                            <p style={{ fontSize: "13px", color: "#3282B8", fontWeight: 500, marginBottom: "10px" }}>
+                                                {course.instructor_title}
+                                            </p>
+                                        )}
+
+                                        {/* Stats row — sirf jo available hain */}
+                                        {(course.instructor_rating || course.instructor_students || course.instructor_courses) && (
+                                            <div className="flex items-center gap-4 flex-wrap mb-3">
+                                                {course.instructor_rating && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Star size={13} className="text-amber-400 fill-amber-400" />
+                                                        <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F172A" }}>
+                                                            {course.instructor_rating} Rating
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {course.instructor_students && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Users size={13} style={{ color: "#3282B8" }} />
+                                                        <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F172A" }}>
+                                                            {course.instructor_students.toLocaleString()} Students
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {course.instructor_courses && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <GraduationCap size={13} style={{ color: "#3282B8" }} />
+                                                        <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F172A" }}>
+                                                            {course.instructor_courses} Courses
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Bio — sirf agar backend se aata hai */}
+                                        {course.instructor_bio && (
+                                            <p style={{
+                                                fontSize: "13.5px", color: "#475569",
+                                                lineHeight: 1.7,
+                                            }}>
+                                                {course.instructor_bio}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </ContentCard>
+                        )}
 
                         {/* Course Details */}
-                        <SectionCard title="Course Details">
-                            <div className="grid grid-cols-2 gap-3">
+                        <ContentCard title="Course Details">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {[
-                                    { label: "Level", value: course.level, capitalize: true },
-                                    { label: "Language", value: course.language },
-                                    { label: "Category", value: course.category_name },
+                                    { label: "Level",       value: course.level,        cap: true },
+                                    { label: "Language",    value: course.language               },
+                                    { label: "Category",    value: course.category_name          },
                                     { label: "Certificate", value: course.certificate_eligible === 1 ? "Included" : "Not included" },
                                 ].map((item) => (
                                     <div key={item.label}
-                                        className="flex items-center gap-3 bg-page rounded-lg px-4 py-3">
-                                        <div>
-                                            <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-0.5">
-                                                {item.label}
-                                            </p>
-                                            <p className={cn(
-                                                "text-[13.5px] font-semibold text-text-primary",
-                                                item.capitalize && "capitalize"
-                                            )}>
-                                                {item.value || "—"}
-                                            </p>
-                                        </div>
+                                        className="rounded-xl px-4 py-3.5"
+                                        style={{ background: "#F8FAFC", border: "1px solid #EEF2F7" }}>
+                                        <p style={{
+                                            fontSize: "10.5px", fontWeight: 700,
+                                            color: "#94A3B8", textTransform: "uppercase",
+                                            letterSpacing: "0.06em", marginBottom: "5px",
+                                        }}>
+                                            {item.label}
+                                        </p>
+                                        <p style={{
+                                            fontSize: "13.5px", fontWeight: 600, color: "#0F172A",
+                                            textTransform: item.cap ? "capitalize" : "none",
+                                        }}>
+                                            {item.value || "—"}
+                                        </p>
                                     </div>
                                 ))}
                             </div>
-                        </SectionCard>
+                        </ContentCard>
                     </div>
 
-                    {/* Right — sticky enroll card */}
-                    <div className="w-[320px] shrink-0">
+                    {/* ── RIGHT — enroll card ── */}
+                    <div className="w-full lg:w-[320px] xl:w-[340px] lg:shrink-0">
                         <CourseEnrollCard
                             course={course}
                             isEnrolled={isEnrolled}
@@ -290,14 +373,22 @@ export default function CourseDetailIndex() {
     );
 }
 
-// ── Section card wrapper ──────────────────────────────────
-function SectionCard({ title, children }) {
+function StatPill({ icon: Icon, label }) {
     return (
-        <div className="bg-white rounded-lg p-6"
-            style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
+        <div className="flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.58)" }}>
+            <Icon size={13} />
+            <span style={{ fontSize: "13px" }}>{label}</span>
+        </div>
+    );
+}
+
+function ContentCard({ title, children }) {
+    return (
+        <div className="bg-white rounded-2xl p-6"
+            style={{ border: "1px solid #EEF2F7", boxShadow: "0 1px 8px rgba(15,23,42,0.05)" }}>
             <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-[3px] h-5 bg-primary rounded-full shrink-0" />
-                <h2 className="text-[16px] font-bold text-text-primary">
+                <div className="w-[3px] h-5 rounded-full bg-primary shrink-0" />
+                <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#0F172A" }}>
                     {title}
                 </h2>
             </div>
@@ -306,31 +397,29 @@ function SectionCard({ title, children }) {
     );
 }
 
-// ── Skeleton ──────────────────────────────────────────────
 function CourseDetailSkeleton() {
     return (
-        <div className="min-h-screen"
-            style={{ background: "linear-gradient(180deg, #EBF4FB 0%, #F8F9FA 100%)" }}>
-            <div style={{ background: "linear-gradient(135deg, #0a2540 0%, #1a3a6c 100%)" }}
-                className="h-[260px] animate-pulse" />
-            <div className="max-w-[1280px] mx-auto px-6 py-8">
-                <div className="flex gap-8">
+        <div className="min-h-screen bg-[#F1F5F9]">
+            <div className="h-[260px] animate-pulse"
+                style={{ background: "linear-gradient(135deg, #0a1628, #162d5a)" }} />
+            <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
                     <div className="flex-1 space-y-5">
                         {Array(3).fill(0).map((_, i) => (
-                            <div key={i} className="bg-white rounded-lg p-6 animate-pulse"
-                                style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
-                                <div className="h-4 bg-border rounded w-36 mb-5" />
+                            <div key={i} className="bg-white rounded-2xl p-6 animate-pulse"
+                                style={{ border: "1px solid #EEF2F7" }}>
+                                <div className="h-4 bg-[#F1F5F9] rounded-full w-36 mb-5" />
                                 <div className="space-y-2.5">
-                                    <div className="h-3 bg-border rounded w-full" />
-                                    <div className="h-3 bg-border rounded w-4/5" />
-                                    <div className="h-3 bg-border rounded w-3/5" />
+                                    <div className="h-3 bg-[#F1F5F9] rounded-full w-full" />
+                                    <div className="h-3 bg-[#F1F5F9] rounded-full w-4/5" />
+                                    <div className="h-3 bg-[#F1F5F9] rounded-full w-3/5" />
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="w-[320px] shrink-0">
-                        <div className="bg-white rounded-lg h-[420px] animate-pulse"
-                            style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.10)" }} />
+                    <div className="w-full lg:w-[320px] shrink-0">
+                        <div className="bg-white rounded-2xl animate-pulse h-[460px]"
+                            style={{ border: "1px solid #EEF2F7" }} />
                     </div>
                 </div>
             </div>

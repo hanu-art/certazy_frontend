@@ -1,17 +1,17 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
     Clock, BarChart2, BookOpen,
-    Award, Globe, PlayCircle, CheckCircle
+    Award, Globe, PlayCircle, CheckCircle,
 } from "lucide-react";
 import { selectIsLoggedIn } from "@/features/auth/authSlice";
-import { cn } from "@/lib/utils";
 
 /**
  * CourseEnrollCard.jsx
- * Sticky right side enrollment card.
- * Button has left-to-right hover sweep animation.
+ *
+ * Desktop → sticky right sidebar
+ * Mobile  → full width below content
+ * Both handled by parent (CourseDetailIndex)
  */
 
 function formatDuration(mins) {
@@ -21,40 +21,41 @@ function formatDuration(mins) {
     return h > 0 ? `${h}h ${m > 0 ? `${m}m` : ""}`.trim() : `${m}m`;
 }
 
-// ── Sweep button ──────────────────────────────────────────
-function SweepButton({ children, onClick, href, className }) {
-    const base = cn(
-        "relative w-full flex items-center justify-center gap-2",
-        "h-11 rounded overflow-hidden",
-        "text-[14px] font-bold text-white transition-all duration-300",
-        className
-    );
-
-    const inner = (
-        <>
-            {/* Sweep overlay */}
-            <span
-                className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"
-                style={{ background: "rgba(0,0,0,0.15)" }}
-            />
-            {/* Content */}
-            <span className="relative z-10 flex items-center gap-2">
-                {children}
-            </span>
-        </>
-    );
+// Single reusable enroll button — color always #3282B8
+function EnrollButton({ onClick, href, children }) {
+    const style = {
+        width: "100%", height: "44px",
+        background: "#3282B8", color: "#fff",
+        border: "none", borderRadius: "12px",
+        fontSize: "14px", fontWeight: 700,
+        cursor: "pointer", transition: "background 0.15s",
+        display: "flex", alignItems: "center",
+        justifyContent: "center", gap: "8px",
+        boxShadow: "0 2px 8px rgba(50,130,184,0.30)",
+        textDecoration: "none",
+    };
 
     if (href) {
         return (
-            <Link to={href} className={cn("group", base)}>
-                {inner}
+            <Link
+                to={href}
+                style={style}
+                onMouseEnter={(e) => e.currentTarget.style.background = "#2a6fa0"}
+                onMouseLeave={(e) => e.currentTarget.style.background = "#3282B8"}
+            >
+                {children}
             </Link>
         );
     }
 
     return (
-        <button onClick={onClick} className={cn("group", base)}>
-            {inner}
+        <button
+            onClick={onClick}
+            style={style}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#2a6fa0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#3282B8"}
+        >
+            {children}
         </button>
     );
 }
@@ -75,10 +76,12 @@ export default function CourseEnrollCard({ course, isEnrolled = false, onEnroll 
     } = course;
 
     const META = [
-        { icon: Clock, label: "Duration", value: formatDuration(total_duration) },
-        { icon: BarChart2, label: "Level", value: level ? level.charAt(0).toUpperCase() + level.slice(1) : "All levels" },
-        { icon: BookOpen, label: "Lessons", value: total_lessons > 0 ? `${total_lessons} lessons` : "Self-paced" },
-        { icon: Globe, label: "Language", value: language || "English" },
+        { icon: Clock,     label: "Duration", value: formatDuration(total_duration) },
+        { icon: BarChart2, label: "Level",    value: level ? level.charAt(0).toUpperCase() + level.slice(1) : "All levels" },
+        ...(total_lessons > 0
+            ? [{ icon: BookOpen, label: "Lessons",  value: `${total_lessons} lessons` }]
+            : []),
+        { icon: Globe,     label: "Language", value: language || "English" },
         ...(certificate_eligible === 1
             ? [{ icon: Award, label: "Certificate", value: "Included" }]
             : []),
@@ -86,35 +89,41 @@ export default function CourseEnrollCard({ course, isEnrolled = false, onEnroll 
 
     return (
         <div
-            className="bg-white rounded-lg overflow-hidden sticky top-[80px]"
-            style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.10)" }}
+            className="bg-white rounded-2xl overflow-hidden lg:sticky lg:top-[86px]"
+            style={{ border: "1px solid #EEF2F7", boxShadow: "0 4px 24px rgba(15,23,42,0.08)" }}
         >
             {/* Thumbnail */}
             <div
-                className="relative h-[180px] flex items-center justify-center overflow-hidden"
-                style={{ background: "linear-gradient(135deg, #0a2540 0%, #1a3a6c 100%)" }}
+                className="relative h-[180px] overflow-hidden"
+                style={{ background: "linear-gradient(135deg, #0a1628 0%, #162d5a 100%)" }}
             >
                 {thumbnail ? (
-                    <img src={thumbnail} alt={course.title}
-                        className="w-full h-full object-cover" />
+                    <img src={thumbnail} alt={course.title} className="w-full h-full object-cover" />
                 ) : (
-                    // Clean pattern — no dots
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-full h-full flex items-center justify-center">
                         <div className="text-center">
-                            <BookOpen size={40} className="mx-auto mb-2 opacity-20 text-white" />
-                            <p className="text-[11px] text-white/30 font-medium uppercase tracking-widest">
+                            <BookOpen size={36} style={{ color: "rgba(255,255,255,0.18)", margin: "0 auto 8px" }} />
+                            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.28)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
                                 Course Preview
                             </p>
                         </div>
                     </div>
                 )}
 
-                {/* Play button */}
+                {/* Overlay */}
+                <div style={{
+                    position: "absolute", inset: 0,
+                    background: "linear-gradient(to top, rgba(0,0,0,0.3), transparent)",
+                }} />
+
+                {/* Play button — only if preview exists */}
                 {preview_video && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-14 h-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
-                            style={{ background: "rgba(255,255,255,0.2)" }}>
-                            <PlayCircle size={32} className="text-white" />
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
+                            style={{ background: "rgba(255,255,255,0.20)", backdropFilter: "blur(4px)" }}
+                        >
+                            <PlayCircle size={28} style={{ color: "#fff" }} />
                         </div>
                     </div>
                 )}
@@ -124,54 +133,51 @@ export default function CourseEnrollCard({ course, isEnrolled = false, onEnroll 
             <div className="p-5">
 
                 {/* Price */}
-                <div className="mb-4">
-                    <span className="text-[30px] font-extrabold text-text-primary tracking-tight">
+                <div className="mb-5">
+                    <span style={{
+                        fontSize: "32px", fontWeight: 800,
+                        color: "#0F172A", letterSpacing: "-0.03em", lineHeight: 1,
+                    }}>
                         ${price}
                     </span>
                 </div>
 
                 {/* CTA */}
                 {isEnrolled ? (
-                    <SweepButton
-                        href={`/student/learn/${course.id}`}
-                        className="bg-primary"
-                    >
-                        <PlayCircle size={17} />
+                    <EnrollButton href={`/student/learn/${course.id}`}>
+                        <PlayCircle size={16} />
                         Continue Learning
-                    </SweepButton>
+                    </EnrollButton>
                 ) : isLoggedIn ? (
-                    <SweepButton
-                        onClick={onEnroll}
-                        className="bg-primary"
-                    >
+                    <EnrollButton onClick={onEnroll}>
                         Enroll Now
-                    </SweepButton>
+                    </EnrollButton>
                 ) : (
-                    <SweepButton
-                        href="/login"
-                        className="bg-primary"
-                    >
+                    <EnrollButton href="/login">
                         Login to Enroll
-                    </SweepButton>
+                    </EnrollButton>
                 )}
 
                 {/* Guarantee */}
-                <p className="text-[11.5px] text-text-muted text-center mt-2.5">
-                    30-day money-back guarantee
-                </p>
+                <div className="flex items-center justify-center gap-1.5 mt-3">
+                    <CheckCircle size={12} style={{ color: "#10B981" }} />
+                    <p style={{ fontSize: "11.5px", color: "#64748B" }}>
+                        30-day money-back guarantee
+                    </p>
+                </div>
 
                 {/* Divider */}
-                <div className="h-px bg-border my-4" />
+                <div className="my-4" style={{ height: "1px", background: "#F1F5F9" }} />
 
-                {/* Meta */}
+                {/* Meta list */}
                 <div className="space-y-3">
                     {META.map((item) => (
                         <div key={item.label} className="flex items-center gap-3">
-                            <item.icon size={14} className="text-primary shrink-0" />
-                            <span className="text-[12.5px] text-text-secondary flex-1">
+                            <item.icon size={14} style={{ color: "#3282B8", flexShrink: 0 }} />
+                            <span style={{ fontSize: "12.5px", color: "#64748B", flex: 1 }}>
                                 {item.label}
                             </span>
-                            <span className="text-[12.5px] font-semibold text-text-primary">
+                            <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F172A" }}>
                                 {item.value}
                             </span>
                         </div>
@@ -181,10 +187,13 @@ export default function CourseEnrollCard({ course, isEnrolled = false, onEnroll 
                 {/* Certificate badge */}
                 {certificate_eligible === 1 && (
                     <>
-                        <div className="h-px bg-border my-4" />
-                        <div className="flex items-center gap-2.5 bg-primary-light rounded-lg px-3.5 py-3">
-                            <CheckCircle size={16} className="text-primary shrink-0" />
-                            <p className="text-[12.5px] font-semibold text-primary">
+                        <div className="my-4" style={{ height: "1px", background: "#F1F5F9" }} />
+                        <div
+                            className="flex items-center gap-2.5 rounded-xl px-3.5 py-3"
+                            style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}
+                        >
+                            <Award size={15} style={{ color: "#3282B8", flexShrink: 0 }} />
+                            <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#1D4ED8" }}>
                                 Certificate of completion included
                             </p>
                         </div>

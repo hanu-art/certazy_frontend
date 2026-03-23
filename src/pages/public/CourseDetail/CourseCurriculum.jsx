@@ -2,69 +2,83 @@ import { useState, useEffect } from "react";
 import {
     ChevronDown, ChevronUp,
     PlayCircle, FileText, HelpCircle,
-    Lock, Eye
+    Lock, Eye,
 } from "lucide-react";
 import lessonService from "@/services/lessonService";
-import { cn } from "@/lib/utils";
+import { cn }        from "@/lib/utils";
 
 /**
  * CourseCurriculum.jsx
- * Premium accordion — sections + lazy-loaded lessons
+ * Accordion — sections + lazy-loaded lessons per section
  */
 
 function formatDuration(seconds) {
     if (!seconds) return null;
-    const m = Math.floor(seconds / 60);
-    const h = Math.floor(m / 60);
+    const m   = Math.floor(seconds / 60);
+    const h   = Math.floor(m / 60);
     const rem = m % 60;
     return h > 0 ? `${h}h ${rem > 0 ? `${rem}m` : ""}`.trim() : `${m}m`;
 }
 
-// ── Lesson type icon ──────────────────────────────────────
+// ── Lesson type icon ───────────────────────────────────────
 function LessonIcon({ type, isLocked }) {
-    if (isLocked) return <Lock size={13} className="text-text-muted shrink-0" />;
+    if (isLocked) return <Lock size={13} style={{ color: "#CBD5E1", flexShrink: 0 }} />;
     const map = {
-        video: <PlayCircle size={13} className="text-primary shrink-0" />,
-        article: <FileText size={13} className="text-green-500 shrink-0" />,
-        quiz: <HelpCircle size={13} className="text-orange-400 shrink-0" />,
+        video:   <PlayCircle size={13} style={{ color: "#2563EB", flexShrink: 0 }} />,
+        article: <FileText   size={13} style={{ color: "#10B981", flexShrink: 0 }} />,
+        quiz:    <HelpCircle size={13} style={{ color: "#F59E0B", flexShrink: 0 }} />,
     };
     return map[type] || map.video;
 }
 
-// ── Single lesson row ─────────────────────────────────────
+// ── Single lesson row ──────────────────────────────────────
 function LessonRow({ lesson, isEnrolled }) {
     const isLocked = !lesson.is_free && !isEnrolled;
     const duration = formatDuration(lesson.duration);
 
     return (
-        <div className={cn(
-            "flex items-center gap-3 px-5 py-3",
-            "border-b border-border last:border-0",
-            !isLocked && "cursor-pointer hover:bg-primary-light transition-colors duration-150 group"
-        )}>
-            {/* Icon */}
+        <div
+            className={cn(
+                "flex items-center gap-3 px-5 py-3",
+                "border-b last:border-0",
+                !isLocked && "cursor-pointer group transition-colors duration-150 hover:bg-[#F8FAFF]"
+            )}
+            style={{ borderColor: "#F1F5F9" }}
+        >
             <LessonIcon type={lesson.type} isLocked={isLocked} />
 
-            {/* Title */}
-            <span className={cn(
-                "flex-1 text-[13px] leading-snug",
-                isLocked
-                    ? "text-text-muted"
-                    : "text-text-primary font-medium group-hover:text-primary transition-colors"
-            )}>
+            <span
+                className={cn(
+                    "flex-1 leading-snug",
+                    !isLocked && "group-hover:text-primary transition-colors duration-150"
+                )}
+                style={{
+                    fontSize: "13px",
+                    fontWeight: isLocked ? 400 : 500,
+                    color: isLocked ? "#94A3B8" : "#0F172A",
+                }}
+            >
                 {lesson.title}
             </span>
 
             {/* Free preview badge */}
             {lesson.is_free === 1 && !isEnrolled && (
-                <span className="flex items-center gap-1 text-[10.5px] font-semibold text-primary bg-primary-light px-2 py-0.5 rounded-full shrink-0">
+                <span
+                    className="flex items-center gap-1 shrink-0"
+                    style={{
+                        fontSize: "10.5px", fontWeight: 600,
+                        color: "#2563EB", background: "#EFF6FF",
+                        padding: "2px 8px", borderRadius: "20px",
+                        border: "1px solid #BFDBFE",
+                    }}
+                >
                     <Eye size={10} /> Preview
                 </span>
             )}
 
             {/* Duration */}
             {duration && (
-                <span className="text-[11.5px] text-text-muted shrink-0">
+                <span style={{ fontSize: "11.5px", color: "#94A3B8", flexShrink: 0 }}>
                     {duration}
                 </span>
             )}
@@ -72,9 +86,9 @@ function LessonRow({ lesson, isEnrolled }) {
     );
 }
 
-// ── Single section ────────────────────────────────────────
+// ── Single section ─────────────────────────────────────────
 function SectionRow({ section, index, isEnrolled }) {
-    const [open, setOpen] = useState(index === 0);
+    const [open,    setOpen]    = useState(index === 0);
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -95,66 +109,89 @@ function SectionRow({ section, index, isEnrolled }) {
     }, [open]);
 
     const totalDuration = lessons.reduce((s, l) => s + (l.duration || 0), 0);
-    const duration = formatDuration(totalDuration);
+    const duration      = formatDuration(totalDuration);
 
     return (
-        <div className={cn(
-            "rounded-lg overflow-hidden border transition-all duration-200",
-            open ? "border-primary/30" : "border-border"
-        )}>
-            {/* Header */}
+        <div
+            className="rounded-xl overflow-hidden transition-all duration-200"
+            style={{
+                border: open ? "1px solid #BFDBFE" : "1px solid #EEF2F7",
+            }}
+        >
+            {/* Section header */}
             <button
                 onClick={() => setOpen(!open)}
-                className={cn(
-                    "w-full flex items-center gap-4 px-5 py-4 text-left transition-colors duration-150",
-                    open ? "bg-primary-light" : "bg-page hover:bg-border/20"
-                )}
+                className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors duration-150"
+                style={{ background: open ? "#EFF6FF" : "#F8FAFC" }}
+                onMouseEnter={(e) => {
+                    if (!open) e.currentTarget.style.background = "#F1F5F9";
+                }}
+                onMouseLeave={(e) => {
+                    if (!open) e.currentTarget.style.background = "#F8FAFC";
+                }}
             >
-                {/* Number */}
-                <span className={cn(
-                    "text-[13px] font-extrabold w-7 shrink-0",
-                    open ? "text-primary" : "text-text-muted"
-                )}>
+                {/* Section number */}
+                <span style={{
+                    fontSize: "12px", fontWeight: 800,
+                    color: open ? "#2563EB" : "#94A3B8",
+                    width: "24px", flexShrink: 0,
+                    letterSpacing: "0.02em",
+                }}>
                     {String(index + 1).padStart(2, "0")}
                 </span>
 
                 {/* Title + meta */}
                 <div className="flex-1 min-w-0">
-                    <p className={cn(
-                        "text-[13.5px] font-bold truncate",
-                        open ? "text-primary" : "text-text-primary"
-                    )}>
+                    <p style={{
+                        fontSize: "13.5px", fontWeight: 700,
+                        color: open ? "#1D4ED8" : "#0F172A",
+                        lineHeight: 1.3,
+                    }}
+                        className="truncate"
+                    >
                         {section.title}
                     </p>
-                    {lessons.length > 0 && (
-                        <p className="text-[11.5px] text-text-muted mt-0.5">
-                            {lessons.length} lessons{duration ? ` • ${duration}` : ""}
+                    {(lessons.length > 0 || loading) && (
+                        <p style={{ fontSize: "11.5px", color: "#94A3B8", marginTop: "3px" }}>
+                            {loading
+                                ? "Loading..."
+                                : `${lessons.length} lesson${lessons.length !== 1 ? "s" : ""}${duration ? ` · ${duration}` : ""}`
+                            }
                         </p>
                     )}
                 </div>
 
                 {/* Chevron */}
                 {open
-                    ? <ChevronUp size={15} className={cn(open ? "text-primary" : "text-text-muted")} />
-                    : <ChevronDown size={15} className="text-text-muted" />
+                    ? <ChevronUp  size={15} style={{ color: "#2563EB", flexShrink: 0 }} />
+                    : <ChevronDown size={15} style={{ color: "#94A3B8", flexShrink: 0 }} />
                 }
             </button>
 
-            {/* Lessons */}
+            {/* Lessons list */}
             {open && (
-                <div className="bg-white">
+                <div style={{ background: "#fff" }}>
                     {loading ? (
-                        <div className="px-5 py-4 space-y-2">
+                        // Skeleton
+                        <div className="px-5 py-4 space-y-3">
                             {Array(3).fill(0).map((_, i) => (
-                                <div key={i} className="h-3 bg-border rounded animate-pulse w-full" />
+                                <div key={i} className="flex items-center gap-3 animate-pulse">
+                                    <div className="w-3.5 h-3.5 rounded-full bg-[#F1F5F9] shrink-0" />
+                                    <div className="h-3 bg-[#F1F5F9] rounded-full flex-1" />
+                                    <div className="h-3 bg-[#F1F5F9] rounded-full w-10 shrink-0" />
+                                </div>
                             ))}
                         </div>
                     ) : lessons.length > 0 ? (
                         lessons.map((lesson) => (
-                            <LessonRow key={lesson.id} lesson={lesson} isEnrolled={isEnrolled} />
+                            <LessonRow
+                                key={lesson.id}
+                                lesson={lesson}
+                                isEnrolled={isEnrolled}
+                            />
                         ))
                     ) : (
-                        <p className="px-5 py-4 text-[13px] text-text-muted italic">
+                        <p style={{ padding: "16px 20px", fontSize: "13px", color: "#94A3B8", fontStyle: "italic" }}>
                             No lessons yet
                         </p>
                     )}
@@ -164,11 +201,11 @@ function SectionRow({ section, index, isEnrolled }) {
     );
 }
 
-// ── Main ─────────────────────────────────────────────────
+// ── Main export ────────────────────────────────────────────
 export default function CourseCurriculum({ sections = [], courseId, isEnrolled = false }) {
     if (sections.length === 0) {
         return (
-            <p className="text-[13px] text-text-muted italic py-2">
+            <p style={{ fontSize: "13px", color: "#94A3B8", fontStyle: "italic", padding: "8px 0" }}>
                 Curriculum not available yet.
             </p>
         );
