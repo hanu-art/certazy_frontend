@@ -1,37 +1,57 @@
-
-
-
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 // Layout
 import NavBarIndex from "@/components/layout/Navbar/NavBarIndex";
 
 // Public pages
-import CoursesPage from "@/pages/public/Courses/CoursesPage"
-import CourseDetailPage from "@/pages/public/CourseDetail/CourseDetailIndex"
+import CoursesPage      from "@/pages/public/Courses/CoursesPage";
+import CourseDetailPage from "@/pages/public/CourseDetail/CourseDetailIndex";
+
+// Auth pages
+import LoginPage     from "@/pages/Auth/LoginPage";
+import RegisterPage  from "@/pages/Auth/RegisterPage";
+import OAuthCallback from "@/pages/Auth/OAuthCallback";
+
 /**
  * AppRoutes.jsx
  *
- * All routes centralized here.
- * Add new routes here only — never in App.jsx directly.
- *
  * Route structure:
  *   Public  → no auth needed
- *   Student → ProtectedRoute (role: student) — coming soon
- *   Admin   → ProtectedRoute (role: admin)   — coming soon
+ *   Student → ProtectedRoute (role: student)  — coming soon
+ *   Admin   → ProtectedRoute (role: admin)    — coming soon
  */
+
+// Auth pages pe navbar + scroll nahi chahiye
+const AUTH_PATHS = ["/login", "/register", "/oauth/callback"];
+
 export default function AppRoutes() {
+    const { pathname } = useLocation();
+    const isAuthPage   = AUTH_PATHS.includes(pathname);
+
     return (
         <>
-            {/* Navbar — always visible */}
-            <NavBarIndex />
+            {/* Navbar — auth pages pe hidden */}
+            {!isAuthPage && <NavBarIndex />}
 
             <Routes>
-                {/* ── PUBLIC ── */}
-                <Route path="/" element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
-                <Route path="/courses" element={<CoursesPage />} />
 
+                {/* ── PUBLIC ── */}
+                <Route path="/"          element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
+                <Route path="/courses"   element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CourseDetailPage />} />
+
+                {/* ── AUTH ── */}
+                <Route path="/login"          element={<LoginPage />} />
+                <Route path="/register"       element={<RegisterPage />} />
+                <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+                {/* ── ADMIN — temporary ── */}
+                <Route path="/admin/dashboard" element={
+                    <div className="p-8 text-center text-text-secondary">
+                        Admin Dashboard coming soon
+                    </div>
+                } />
+
                 {/* ── 404 ── */}
                 <Route path="*" element={
                     <div className="min-h-screen flex items-center justify-center">
@@ -41,6 +61,7 @@ export default function AppRoutes() {
                         </div>
                     </div>
                 } />
+
             </Routes>
         </>
     );
