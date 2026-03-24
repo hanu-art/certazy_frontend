@@ -12,6 +12,9 @@ import LoginPage     from "@/pages/Auth/LoginPage";
 import RegisterPage  from "@/pages/Auth/RegisterPage";
 import OAuthCallback from "@/pages/Auth/OAuthCallback";
 
+//contact
+import ContactPage from "@/pages/contact/ContactPage";
+
 /**
  * AppRoutes.jsx
  *
@@ -39,6 +42,9 @@ export default function AppRoutes() {
                 <Route path="/"          element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
                 <Route path="/courses"   element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CourseDetailPage />} />
+               
+               {/*contact*/}
+               <Route path="/contact" element={<ContactPage />} />
 
                 {/* ── AUTH ── */}
                 <Route path="/login"          element={<LoginPage />} />

@@ -2,6 +2,7 @@ import React from "react";
 import RouterProgress from "@/components/shared/RouterProgress";
 import AppRoutes from "@/routes/AppRoutes";
 import { Toaster } from "react-hot-toast";
+import Footer from "@/components/layout/Footer";
 export default function App() {
   return (
     <>
@@ -18,6 +19,7 @@ export default function App() {
 />
       <RouterProgress />
       <AppRoutes />
+      <Footer/>
     </>
   );
 }
