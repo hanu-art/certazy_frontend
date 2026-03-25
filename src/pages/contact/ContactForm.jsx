@@ -98,7 +98,7 @@ export default function ContactForm() {
     setLoading(true);
     try {
       await contactService.submit(form);
-      toast.success("Message bhej diya! Hum jaldi reply karenge. ✅");
+      toast.success("Message sent successfully! We will get back to you soon");
       setForm((prev) => ({
         ...prev,
         phone: "",
@@ -107,7 +107,7 @@ export default function ContactForm() {
         ...(isLoggedIn ? {} : { name: "", email: "" }),
       }));
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Kuch gadbad ho gayi, dobara try karo.");
+      toast.error(err?.response?.data?.message || "Something went wrong, please try again.");
     } finally {
       setLoading(false);
     }
@@ -247,7 +247,17 @@ export default function ContactForm() {
 
         {/* ── RIGHT: Map + Hours ─────────────────────────────── */}
         <div className="flex flex-col gap-5">
-          <WorldMapSVG />
+         
+
+     <iframe
+  src="https://www.google.com/maps?q=CERTEZY%20E-LEARNING%20PRIVATE%20LIMITED%20Indore&output=embed"
+  width="100%"
+  height="220"
+  style={{ border: 0, borderRadius: "16px" }}
+  loading="lazy"
+/> 
+  
+
 
           {/* Office Hours */}
           <div
