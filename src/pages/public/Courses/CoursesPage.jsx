@@ -60,8 +60,7 @@ export default function CoursesPage() {
         if (filters.level)       params.level       = filters.level;
         if (filters.search)      params.search      = filters.search;
         if (filters.sort)        params.sort        = filters.sort;
-        dispatch(fetchCourses(params));
-    }, [filters.category_id, filters.level, filters.search, filters.sort, pagination.page]);
+    }, [filters.category_id, filters.level, filters.search, filters.sort, pagination.page, pagination.limit]);
 
     // ── Hero search submit ─────────────────────────────────
     const handleHeroSearch = (e) => {

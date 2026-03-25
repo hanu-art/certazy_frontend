@@ -1,5 +1,4 @@
 import axios from "axios";
-
 /**
  * api.js — Axios Instance
  *
@@ -21,23 +20,20 @@ const api = axios.create({
     },
 });
 
-// ── Store ko lazy load karo — circular import se bachne ke liye ──
-let store;
-const getStore = async () => {
-    if (!store) {
-        store = (await import("@/app/store")).default;
-    }
-    return store;
+export let injectedStore = null;
+export const injectStore = (_store) => {
+    injectedStore = _store;
 };
 
 // ── Request interceptor ───────────────────────────────────
 // Har request se pehle — access token header mein lagao
 api.interceptors.request.use(
-    async (config) => {
-        const s = await getStore();
-        const token = s.getState().auth.accessToken;
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+    (config) => { 
+        if (injectedStore) {
+            const token = injectedStore.getState().auth.accessToken;
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
         return config;
     },
@@ -81,9 +77,10 @@ api.interceptors.response.use(
                 const { data } = await api.post("/v1/auth/refresh");
                 const newToken = data.data.accessToken;
 
-                const s = await getStore();
-                const { setToken } = await import("@/features/auth/authSlice");
-                s.dispatch(setToken(newToken));
+                if (injectedStore) {
+                    const { setToken } = await import("@/features/auth/authSlice");
+                    injectedStore.dispatch(setToken(newToken)); // ✅ store direct use
+                }
 
                 processQueue(null, newToken);
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -92,9 +89,10 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 processQueue(refreshError, null);
 
-                const s = await getStore();
-                const { logout } = await import("@/features/auth/authSlice");
-                s.dispatch(logout());
+                if (injectedStore) {
+                    const { logoutUser } = await import("@/features/auth/authSlice"); // ✅ logout → logoutUser
+                    injectedStore.dispatch(logoutUser());
+                }
 
                 window.location.href = "/login";
                 return Promise.reject(refreshError);

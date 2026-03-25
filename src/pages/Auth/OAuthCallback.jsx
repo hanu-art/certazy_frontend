@@ -25,7 +25,7 @@ export default function OAuthCallback() {
                 if (role === "admin" || role === "sub_admin") {
                     navigate("/admin/dashboard", { replace: true });
                 } else {
-                    navigate("/", { replace: true });
+                    navigate("/student/dashboard", { replace: true });
                 }
             } catch {
                 // fetchMe fail — token invalid

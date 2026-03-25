@@ -8,6 +8,9 @@ import "nprogress/nprogress.css";
 import "@/styles/nprogress-custom.css";
 import App from "./App.jsx";
 import "./index.css";
+import { injectStore } from "./services/api.js";
+
+injectStore(store);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>

@@ -26,7 +26,10 @@ export default function RegisterPage() {
     const [submitting,  setSubmitting]  = useState(false);
 
     useEffect(() => {
-        if (isLoggedIn) navigate("/", { replace: true });
+        if (isLoggedIn){
+            toast.success("Account created! Please login");
+            navigate("/login", { replace: true });
+        }
     }, [isLoggedIn]);
 
     useEffect(() => {

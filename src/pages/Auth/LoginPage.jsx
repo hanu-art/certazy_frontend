@@ -12,19 +12,21 @@ import {
 import SocialButtons from "@/components/auth/SocialButtons";
 
 export default function LoginPage() {
-    const dispatch   = useDispatch();
-    const navigate   = useNavigate();
-    const [params]   = useSearchParams();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [params] = useSearchParams();
 
-    const loading    = useSelector(selectAuthLoading);
+    const loading = useSelector(selectAuthLoading);
     const isLoggedIn = useSelector(selectIsLoggedIn);
-
-    const [form, setForm]           = useState({ email: "", password: "" });
+      console.log(isLoggedIn)
+    const [form, setForm] = useState({ email: "", password: "" });
     const [showPassword, setShowPass] = useState(false);
     const [fieldErrors, setFieldErrors] = useState({});
 
     useEffect(() => {
-        if (isLoggedIn) navigate("/", { replace: true });
+        if (isLoggedIn) {
+            navigate("/student/dashboard", { replace: true });
+        }
     }, [isLoggedIn]);
 
     useEffect(() => {
@@ -40,10 +42,10 @@ export default function LoginPage() {
 
     const validate = () => {
         const errs = {};
-        if (!form.email.trim())                     errs.email    = "Email is required";
-        else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email    = "Enter a valid email";
-        if (!form.password)                         errs.password = "Password is required";
-        else if (form.password.length < 6)          errs.password = "Minimum 6 characters";
+        if (!form.email.trim()) errs.email = "Email is required";
+        else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "Enter a valid email";
+        if (!form.password) errs.password = "Password is required";
+        else if (form.password.length < 6) errs.password = "Minimum 6 characters";
         setFieldErrors(errs);
         return Object.keys(errs).length === 0;
     };
@@ -123,9 +125,9 @@ export default function LoginPage() {
                         <div style={{ paddingTop: "24px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
                             <div style={{ display: "flex", gap: "28px", flexWrap: "wrap" }}>
                                 {[
-                                    { value: "500+", label: "Courses"  },
+                                    { value: "500+", label: "Courses" },
                                     { value: "50k+", label: "Students" },
-                                    { value: "4.8★", label: "Rating"   },
+                                    { value: "4.8★", label: "Rating" },
                                 ].map((s) => (
                                     <div key={s.label}>
                                         <p style={{ fontSize: "18px", fontWeight: 800, color: "#fff", lineHeight: 1, letterSpacing: "-0.02em" }}>
@@ -180,7 +182,7 @@ export default function LoginPage() {
                                         autoComplete="email"
                                         style={inputSt(!!fieldErrors.email)}
                                         onFocus={(e) => onFocus(e, !!fieldErrors.email)}
-                                        onBlur={(e)  => onBlur(e,  !!fieldErrors.email)}
+                                        onBlur={(e) => onBlur(e, !!fieldErrors.email)}
                                     />
                                 </InputWrapper>
                                 <FieldErr msg={fieldErrors.email} />
@@ -203,7 +205,7 @@ export default function LoginPage() {
                                         autoComplete="current-password"
                                         style={{ ...inputSt(!!fieldErrors.password), paddingRight: "44px" }}
                                         onFocus={(e) => onFocus(e, !!fieldErrors.password)}
-                                        onBlur={(e)  => onBlur(e,  !!fieldErrors.password)}
+                                        onBlur={(e) => onBlur(e, !!fieldErrors.password)}
                                     />
                                     <EyeBtn show={showPassword} toggle={() => setShowPass(!showPassword)} />
                                 </InputWrapper>
@@ -241,8 +243,8 @@ function Logo({ size = "lg" }) {
             }}>
                 <svg width={big ? 16 : 14} height={big ? 16 : 14} viewBox="0 0 24 24" fill="none"
                     stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
             </div>
             <span style={{ fontSize: big ? "17px" : "16px", fontWeight: 800, color: "#fff", letterSpacing: "-0.5px" }}>
@@ -346,15 +348,15 @@ const inputSt = (hasError) => ({
 const onFocus = (e, hasError) => {
     if (!hasError) {
         e.target.style.borderColor = "#3282B8";
-        e.target.style.background  = "#fff";
-        e.target.style.boxShadow   = "0 0 0 3px rgba(50,130,184,0.10)";
+        e.target.style.background = "#fff";
+        e.target.style.boxShadow = "0 0 0 3px rgba(50,130,184,0.10)";
     }
 };
 
 const onBlur = (e, hasError) => {
     if (!hasError) {
         e.target.style.borderColor = "#E2E8F0";
-        e.target.style.background  = "#F8FAFC";
-        e.target.style.boxShadow   = "none";
+        e.target.style.background = "#F8FAFC";
+        e.target.style.boxShadow = "none";
     }
 };
