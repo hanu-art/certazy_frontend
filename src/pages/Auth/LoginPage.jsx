@@ -7,6 +7,7 @@ import {
     loginUser,
     selectAuthLoading,
     selectIsLoggedIn,
+    selectUser,
     clearError,
 } from "@/features/auth/authSlice";
 import SocialButtons from "@/components/auth/SocialButtons";
@@ -18,16 +19,21 @@ export default function LoginPage() {
 
     const loading = useSelector(selectAuthLoading);
     const isLoggedIn = useSelector(selectIsLoggedIn);
-      console.log(isLoggedIn)
+    const user = useSelector(selectUser);
+    console.log(isLoggedIn)
     const [form, setForm] = useState({ email: "", password: "" });
     const [showPassword, setShowPass] = useState(false);
     const [fieldErrors, setFieldErrors] = useState({});
 
     useEffect(() => {
         if (isLoggedIn) {
-            navigate("/student/dashboard", { replace: true });
+            if (user?.role === "admin" || user?.role === "sub_admin") {
+                navigate("/admin/dashboard", { replace: true });
+            } else {
+                navigate("/student/dashboard", { replace: true });
+            }
         }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, user, navigate]);
 
     useEffect(() => {
         return () => dispatch(clearError());
@@ -66,7 +72,7 @@ export default function LoginPage() {
             if (role === "admin" || role === "sub_admin") {
                 navigate("/admin/dashboard", { replace: true });
             } else {
-                navigate("/", { replace: true });
+                navigate("/student/dashboard", { replace: true });
             }
         } catch (err) {
             toast.error(err || "Login failed. Please try again.");

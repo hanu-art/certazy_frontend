@@ -9,24 +9,24 @@ import {
     selectIsLoggedIn,
     clearError,
 } from "@/features/auth/authSlice";
-import authService    from "@/services/authService";
-import SocialButtons  from "@/components/auth/SocialButtons";
+import authService from "@/services/authService";
+import SocialButtons from "@/components/auth/SocialButtons";
 
 export default function RegisterPage() {
-    const dispatch   = useDispatch();
-    const navigate   = useNavigate();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const loading    = useSelector(selectAuthLoading);
+    const loading = useSelector(selectAuthLoading);
     const isLoggedIn = useSelector(selectIsLoggedIn);
 
     const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
-    const [showPass,    setShowPass]    = useState(false);
+    const [showPass, setShowPass] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [fieldErrors, setFieldErrors] = useState({});
-    const [submitting,  setSubmitting]  = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        if (isLoggedIn){
+        if (isLoggedIn) {
             toast.success("Account created! Please login");
             navigate("/login", { replace: true });
         }
@@ -40,18 +40,18 @@ export default function RegisterPage() {
     const getStrength = (p) => {
         if (!p) return 0;
         let s = 0;
-        if (p.length >= 8)           s++;
-        if (/[A-Z]/.test(p))         s++;
-        if (/[0-9]/.test(p))         s++;
-        if (/[^A-Za-z0-9]/.test(p))  s++;
+        if (p.length >= 8) s++;
+        if (/[A-Z]/.test(p)) s++;
+        if (/[0-9]/.test(p)) s++;
+        if (/[^A-Za-z0-9]/.test(p)) s++;
         return s;
     };
 
     const strengthInfo = [
-        { label: "",       color: "#E2E8F0" },
-        { label: "Weak",   color: "#EF4444" },
-        { label: "Fair",   color: "#F59E0B" },
-        { label: "Good",   color: "#3B82F6" },
+        { label: "", color: "#E2E8F0" },
+        { label: "Weak", color: "#EF4444" },
+        { label: "Fair", color: "#F59E0B" },
+        { label: "Good", color: "#3B82F6" },
         { label: "Strong", color: "#10B981" },
     ];
 
@@ -59,13 +59,13 @@ export default function RegisterPage() {
 
     const validate = () => {
         const errs = {};
-        if (!form.name.trim())                           errs.name            = "Full name is required";
-        else if (form.name.trim().length < 2)            errs.name            = "Name too short";
-        if (!form.email.trim())                          errs.email           = "Email is required";
-        else if (!/\S+@\S+\.\S+/.test(form.email))      errs.email           = "Enter a valid email";
-        if (!form.password)                              errs.password        = "Password is required";
-        else if (form.password.length < 6)               errs.password        = "Minimum 6 characters";
-        if (!form.confirmPassword)                       errs.confirmPassword = "Please confirm your password";
+        if (!form.name.trim()) errs.name = "Full name is required";
+        else if (form.name.trim().length < 2) errs.name = "Name too short";
+        if (!form.email.trim()) errs.email = "Email is required";
+        else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "Enter a valid email";
+        if (!form.password) errs.password = "Password is required";
+        else if (form.password.length < 6) errs.password = "Minimum 6 characters";
+        if (!form.confirmPassword) errs.confirmPassword = "Please confirm your password";
         else if (form.password !== form.confirmPassword) errs.confirmPassword = "Passwords do not match";
         setFieldErrors(errs);
         return Object.keys(errs).length === 0;
@@ -86,14 +86,14 @@ export default function RegisterPage() {
 
             // Step 1 — Register
             await authService.register({
-                name:     form.name.trim(),
-                email:    form.email.trim(),
+                name: form.name.trim(),
+                email: form.email.trim(),
                 password: form.password,
             });
 
             // Step 2 — Auto login
             const result = await dispatch(loginUser({
-                email:    form.email.trim(),
+                email: form.email.trim(),
                 password: form.password,
             })).unwrap();
 
@@ -163,9 +163,9 @@ export default function RegisterPage() {
 
                         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                             {[
-                                { icon: "🎓", title: "500+ Certification Courses", desc: "AWS, Azure, Security+, PMP and more"  },
-                                { icon: "📜", title: "Industry Certificates",       desc: "Recognized by top employers globally" },
-                                { icon: "⚡", title: "Learn at Your Pace",          desc: "Lifetime access to course materials"  },
+                                { icon: "🎓", title: "500+ Certification Courses", desc: "AWS, Azure, Security+, PMP and more" },
+                                { icon: "📜", title: "Industry Certificates", desc: "Recognized by top employers globally" },
+                                { icon: "⚡", title: "Learn at Your Pace", desc: "Lifetime access to course materials" },
                             ].map((f) => (
                                 <div key={f.title} style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
                                     <div style={{
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                                         autoComplete="name"
                                         style={inputSt(!!fieldErrors.name)}
                                         onFocus={(e) => onFocus(e, !!fieldErrors.name)}
-                                        onBlur={(e)  => onBlur(e,  !!fieldErrors.name)}
+                                        onBlur={(e) => onBlur(e, !!fieldErrors.name)}
                                     />
                                 </div>
                                 <FieldErr msg={fieldErrors.name} />
@@ -254,7 +254,7 @@ export default function RegisterPage() {
                                         autoComplete="email"
                                         style={inputSt(!!fieldErrors.email)}
                                         onFocus={(e) => onFocus(e, !!fieldErrors.email)}
-                                        onBlur={(e)  => onBlur(e,  !!fieldErrors.email)}
+                                        onBlur={(e) => onBlur(e, !!fieldErrors.email)}
                                     />
                                 </div>
                                 <FieldErr msg={fieldErrors.email} />
@@ -273,7 +273,7 @@ export default function RegisterPage() {
                                         autoComplete="new-password"
                                         style={{ ...inputSt(!!fieldErrors.password), paddingRight: "44px" }}
                                         onFocus={(e) => onFocus(e, !!fieldErrors.password)}
-                                        onBlur={(e)  => onBlur(e,  !!fieldErrors.password)}
+                                        onBlur={(e) => onBlur(e, !!fieldErrors.password)}
                                     />
                                     <EyeBtn show={showPass} toggle={() => setShowPass(!showPass)} />
                                 </div>
@@ -311,7 +311,7 @@ export default function RegisterPage() {
                                         autoComplete="new-password"
                                         style={{ ...inputSt(!!fieldErrors.confirmPassword), paddingRight: "44px" }}
                                         onFocus={(e) => onFocus(e, !!fieldErrors.confirmPassword)}
-                                        onBlur={(e)  => onBlur(e,  !!fieldErrors.confirmPassword)}
+                                        onBlur={(e) => onBlur(e, !!fieldErrors.confirmPassword)}
                                     />
                                     <EyeBtn show={showConfirm} toggle={() => setShowConfirm(!showConfirm)} />
 
@@ -365,8 +365,8 @@ function Logo({ size = "lg", dark = false }) {
             }}>
                 <svg width={big ? 16 : 14} height={big ? 16 : 14} viewBox="0 0 24 24" fill="none"
                     stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
             </div>
             <span style={{
@@ -464,15 +464,15 @@ const inputSt = (hasError) => ({
 const onFocus = (e, hasError) => {
     if (!hasError) {
         e.target.style.borderColor = "#3282B8";
-        e.target.style.background  = "#fff";
-        e.target.style.boxShadow   = "0 0 0 3px rgba(50,130,184,0.10)";
+        e.target.style.background = "#fff";
+        e.target.style.boxShadow = "0 0 0 3px rgba(50,130,184,0.10)";
     }
 };
 
 const onBlur = (e, hasError) => {
     if (!hasError) {
         e.target.style.borderColor = "#E2E8F0";
-        e.target.style.background  = "#F8FAFC";
-        e.target.style.boxShadow   = "none";
+        e.target.style.background = "#F8FAFC";
+        e.target.style.boxShadow = "none";
     }
 };
