@@ -98,6 +98,16 @@ const authSlice = createSlice({
         clearError: (state) => {
             state.error = null;
         },
+
+        // Clear auth state completely
+        clearAuth: (state) => {
+            state.user = null;
+            state.accessToken = null;
+            state.isLoggedIn = false;
+            state.isFirstLogin = false;
+            state.loading = false;
+            state.error = null;
+        },
     },
 
     extraReducers: (builder) => {
@@ -157,7 +167,7 @@ const authSlice = createSlice({
     },
 });
 
-export const { setToken, setAuthFromOAuth, clearError } = authSlice.actions;
+export const { setToken, setAuthFromOAuth, clearError, clearAuth } = authSlice.actions;
 
 // ── Selectors ─────────────────────────────────────────────
 export const selectUser = (state) => state.auth.user;

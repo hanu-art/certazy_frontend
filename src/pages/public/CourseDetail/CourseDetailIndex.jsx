@@ -8,6 +8,7 @@ import {
 
 import courseService   from "@/services/courseService";
 import sectionService  from "@/services/sectionService";
+import enrollmentService from "@/services/enrollmentService";
 import { selectIsLoggedIn, selectUser } from "@/features/auth/authSlice";
 
 import CourseCurriculum from "./CourseCurriculum";
@@ -24,8 +25,7 @@ export default function CourseDetailIndex() {
     const [sections, setSections] = useState([]);
     const [loading,  setLoading]  = useState(true);
     const [error,    setError]    = useState(null);
-
-    const isEnrolled = user?.enrolled_courses?.includes(course?.id) ?? false;
+    const [isEnrolled, setIsEnrolled] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -45,10 +45,22 @@ export default function CourseDetailIndex() {
         fetchData();
     }, [slug]);
 
+    useEffect(() => {
+        if (!isLoggedIn || !course?.id) return;
+        enrollmentService.checkEnrollment(course.id)
+            .then(({ data }) => setIsEnrolled(data?.data?.enrolled ?? false))
+            .catch(() => {});
+    }, [isLoggedIn, course?.id]);
+
     const handleEnroll = () => {
-        if (!isLoggedIn) { navigate("/login"); return; }
+        sessionStorage.setItem(`course_${course.id}`, JSON.stringify(course));
+        if (!isLoggedIn) {
+            navigate(`/login?redirect=/checkout?course=${course.id}`);
+            return;
+        }
         navigate(`/checkout?course=${course.id}`);
-    };
+    };  
+
 
     if (loading) return <CourseDetailSkeleton />;
 

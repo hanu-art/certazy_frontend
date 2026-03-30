@@ -27,6 +27,11 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (isLoggedIn) {
+            const redirectTo = params.get("redirect");
+            if (redirectTo) {
+                navigate(decodeURIComponent(redirectTo), { replace: true });
+                return;
+            }
             if (user?.role === "admin" || user?.role === "sub_admin") {
                 navigate("/admin/dashboard", { replace: true });
             } else {
@@ -68,6 +73,11 @@ export default function LoginPage() {
         try {
             const result = await dispatch(loginUser(form)).unwrap();
             toast.success(`Welcome back, ${result.user?.name?.split(" ")[0]}!`);
+            const redirectTo = params.get("redirect");
+            if (redirectTo) {
+                navigate(decodeURIComponent(redirectTo), { replace: true });
+                return;
+            }
             const role = result.user?.role;
             if (role === "admin" || role === "sub_admin") {
                 navigate("/admin/dashboard", { replace: true });

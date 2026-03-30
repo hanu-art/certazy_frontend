@@ -62,7 +62,8 @@ api.interceptors.response.use(
             error.response?.status === 401 &&
             !originalRequest._retry &&
             !originalRequest.url.includes('/auth/login') &&
-            !originalRequest.url.includes('/auth/register')
+            !originalRequest.url.includes('/auth/register') &&
+            !originalRequest.url.includes('/auth/refresh')
         ) {
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
@@ -95,11 +96,12 @@ api.interceptors.response.use(
                 processQueue(refreshError, null);
 
                 if (injectedStore) {
-                    const { logoutUser } = await import("@/features/auth/authSlice"); // ✅ logout → logoutUser
-                    injectedStore.dispatch(logoutUser());
+                    const { clearAuth } = await import("@/features/auth/authSlice");
+                    injectedStore.dispatch(clearAuth());
                 }
-
-                window.location.href = "/login";
+                if (window.location.pathname !== "/login") {
+                    window.location.href = "/login";
+                }
                 return Promise.reject(refreshError);
 
             } finally {

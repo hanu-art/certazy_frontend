@@ -74,6 +74,14 @@ export default function DashboardPage() {
             }
         };
         fetchAll();
+        
+        // Listen for enrollment updates (e.g., after payment)
+        const handleEnrollmentUpdate = () => fetchAll();
+        window.addEventListener('enrollment-updated', handleEnrollmentUpdate);
+        
+        return () => {
+            window.removeEventListener('enrollment-updated', handleEnrollmentUpdate);
+        };
     }, []);
 
     // ── Derived stats ──────────────────────────────────────────────────────────

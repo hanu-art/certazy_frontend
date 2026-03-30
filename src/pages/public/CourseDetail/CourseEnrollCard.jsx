@@ -144,7 +144,7 @@ export default function CourseEnrollCard({ course, isEnrolled = false, onEnroll 
 
                 {/* CTA */}
                 {isEnrolled ? (
-                    <EnrollButton href={`/student/learn/${course.id}`}>
+                    <EnrollButton href={`/student/course/${course.id}/learn`}>
                         <PlayCircle size={16} />
                         Continue Learning
                     </EnrollButton>
