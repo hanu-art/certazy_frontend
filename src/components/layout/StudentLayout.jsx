@@ -182,6 +182,7 @@ export default function StudentLayout({ children }) {
                 {/* Page content */}
                 <main className="flex-1 overflow-y-auto">
                    <Outlet/>
+                   {children}
                 </main>
             </div>
         </div>

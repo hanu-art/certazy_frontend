@@ -22,6 +22,7 @@ import DashboardPage      from "@/pages/student/DashboardPage";
 import MyCoursesPage      from "@/pages/student/MyCoursesPage";
 import CertificatesPage   from "@/pages/student/CertificatesPage";
 import PaymentHistoryPage from "@/pages/student/PaymentHistoryPage";
+import ProfilePage        from "@/pages/student/ProfilePage";
 import CoursePlayerPage   from "@/pages/student/CoursePlayerPage";
 import ProtectedRoute     from "@/components/shared/ProtectedRoute";
 
@@ -63,6 +64,7 @@ export default function AppRoutes() {
                     <Route path="my-courses"   element={<MyCoursesPage />} />
                     <Route path="certificates" element={<CertificatesPage />} />
                     <Route path="payments"     element={<PaymentHistoryPage />} />
+                    <Route path="profile"       element={<ProfilePage />} />
                 </Route>
        
   

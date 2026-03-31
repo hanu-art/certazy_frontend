@@ -31,6 +31,7 @@ const authService = {
     refresh: () => api.post("/v1/auth/refresh"),
     logout: () => api.post("/v1/auth/logout"),
     changePassword: (data) => api.post("/v1/auth/change-password", data),
+    updateProfile: (data) => api.put("/v1/auth/profile", data),
     me: () => api.get("/v1/auth/me"),
 
     // OAuth — browser redirect (not axios)
