@@ -3,14 +3,16 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import {
     ChevronLeft, ChevronDown, ChevronRight,
     PlayCircle, CheckCircle2, Lock, BookOpen,
-    Clock, FileText, Menu, X, AlertCircle,
+    Clock, FileText, Menu, X, AlertCircle, Award,
 } from "lucide-react";
 
 import sectionService  from "@/services/sectionService";
 import lessonService   from "@/services/lessonService";
 import progressService from "@/services/progressService";
 import enrollmentService from "@/services/enrollmentService";
+import testService      from "@/services/testService";
 import { cn }          from "@/lib/utils";
+import { EnhancedTextLesson } from "@/components/player/EnhancedTextLesson";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PROGRESS_SYNC_INTERVAL = 15; // seconds — har 15s mein progress save
@@ -36,6 +38,7 @@ export default function CoursePlayerPage() {
     const [loading,       setLoading]       = useState(true);
     const [error,         setError]         = useState(null);
     const [isEnrolled,    setIsEnrolled]    = useState(false);
+    const [courseExams,   setCourseExams]   = useState([]);   // Exams for this course
 
     // ── UI state ───────────────────────────────────────────────────────────────
     const [sidebarOpen,    setSidebarOpen]    = useState(true);
@@ -93,7 +96,16 @@ export default function CoursePlayerPage() {
                 setProgressMap(map);
                 completedRef.current = map;
 
-                // 6. Set current lesson — first incomplete or first lesson
+                // 6. Fetch exams for this course
+                try {
+                    const examRes = await testService.getByCourseId(courseId);
+                    setCourseExams(examRes.data?.data?.tests ?? []);
+                } catch (examErr) {
+                    console.warn("No exams found for this course:", examErr);
+                    setCourseExams([]);
+                }
+
+                // 7. Set current lesson — first incomplete or first lesson
                 const allLessons = sectionsWithLessons.flatMap((s) => s.lessons);
                 if (allLessons.length > 0) {
                     const firstIncomplete = allLessons.find(
@@ -283,14 +295,30 @@ export default function CoursePlayerPage() {
                                         style={{ outline: "none" }}
                                     />
                                 ) : (
-                                    // Text / article lesson
-                                    <div className="w-full h-full flex items-center justify-center bg-[#0a1628]">
-                                        <div className="text-center">
-                                            <FileText size={48} style={{ color: "rgba(255,255,255,0.2)" }} className="mx-auto mb-3" />
-                                            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
-                                                Text lesson — read below
-                                            </p>
-                                        </div>
+                                    // Text / article lesson content area
+                                    <div className="w-full h-full bg-[#0a1628] overflow-y-auto">
+                                        {currentLesson.content ? (
+                                            <div className="p-6">
+                                                <EnhancedTextLesson
+                                                    lesson={currentLesson}
+                                                    onMarkComplete={markLessonComplete}
+                                                    isCompleted={!!progressMap[currentLesson.id]?.is_completed}
+                                                    onPrevious={goToPrevLesson}
+                                                    onNext={goToNextLesson}
+                                                    hasNext={currentIdx < allLessons.length - 1}
+                                                    hasPrevious={currentIdx > 0}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <FileText size={48} style={{ color: "rgba(255,255,255,0.2)" }} className="mx-auto mb-3" />
+                                                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
+                                                        No content available
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -340,51 +368,41 @@ export default function CoursePlayerPage() {
                                     </div>
                                 )}
 
-                                {/* Text content */}
-                                {currentLesson.type !== "video" && currentLesson.content && (
-                                    <div
-                                        className="prose prose-invert max-w-none mb-6 p-5 rounded-2xl"
-                                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                                    >
-                                        <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", lineHeight: 1.8, whiteSpace: "pre-line" }}>
-                                            {currentLesson.content}
-                                        </p>
+                                {/* Prev / Next buttons - Only for video lessons */}
+                                {currentLesson.type === "video" && (
+                                    <div className="flex items-center justify-between pt-4"
+                                        style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                                        <button
+                                            onClick={goToPrevLesson}
+                                            disabled={currentIdx === 0}
+                                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all disabled:opacity-30"
+                                            style={{
+                                                background: "rgba(255,255,255,0.06)",
+                                                color: "#fff",
+                                                fontSize: "13px",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                                            <ChevronLeft size={16} />
+                                            Previous
+                                        </button>
+
+                                        <button
+                                            onClick={goToNextLesson}
+                                            disabled={currentIdx === allLessons.length - 1}
+                                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all disabled:opacity-30"
+                                            style={{
+                                                background: "#3282B8",
+                                                color: "#fff",
+                                                fontSize: "13px",
+                                                fontWeight: 700,
+                                            }}
+                                        >
+                                            Next Lesson
+                                            <ChevronRight size={16} />
+                                        </button>
                                     </div>
                                 )}
-
-                                {/* Prev / Next buttons */}
-                                <div className="flex items-center justify-between pt-4"
-                                    style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                                    <button
-                                        onClick={goToPrevLesson}
-                                        disabled={currentIdx === 0}
-                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all disabled:opacity-30"
-                                        style={{
-                                            background: "rgba(255,255,255,0.06)",
-                                            color: "#fff",
-                                            fontSize: "13px",
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        <ChevronLeft size={16} />
-                                        Previous
-                                    </button>
-
-                                    <button
-                                        onClick={goToNextLesson}
-                                        disabled={currentIdx === allLessons.length - 1}
-                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all disabled:opacity-30"
-                                        style={{
-                                            background: "#3282B8",
-                                            color: "#fff",
-                                            fontSize: "13px",
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        Next Lesson
-                                        <ChevronRight size={16} />
-                                    </button>
-                                </div>
                             </div>
                         </>
                     ) : (
@@ -410,6 +428,9 @@ export default function CoursePlayerPage() {
                             setExpandedSections((prev) => ({ ...prev, [id]: !prev[id] }))
                         }
                         onSelectLesson={openLesson}
+                        courseExams={courseExams}
+                        courseId={courseId}
+                        navigate={navigate}
                     />
                 )}
             </div>
@@ -486,6 +507,7 @@ function TopBar({ navigate, progressPct, completedLessons, totalLessons, sidebar
 function CourseSidebar({
     sections, currentLesson, progressMap,
     expandedSections, onToggleSection, onSelectLesson,
+    courseExams, courseId, navigate,
 }) {
     return (
         <aside
@@ -626,6 +648,54 @@ function CourseSidebar({
                     );
                 })}
             </div>
+
+            {/* Exams Section */}
+            {courseExams.length > 0 && (
+                <div className="border-t border-gray-200">
+                    <div className="px-5 py-4">
+                        <p style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}>
+                            Course Exams
+                        </p>
+                        <p style={{ fontSize: "11.5px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>
+                            {courseExams.length} exam{courseExams.length > 1 ? 's' : ''} available
+                        </p>
+                    </div>
+                    <div className="px-2 pb-4">
+                        {courseExams.map((exam) => (
+                            <button
+                                key={exam.id}
+                                onClick={() => navigate(`/student/course/${courseId}/exam/${exam.id}`)}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-white/5"
+                            >
+                                <div className="shrink-0 w-5 h-5 flex items-center justify-center">
+                                    <Award size={16} style={{ color: "#3282B8" }} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p
+                                        className="truncate"
+                                        style={{
+                                            fontSize: "12px",
+                                            fontWeight: 500,
+                                            color: "rgba(255,255,255,0.8)",
+                                            lineHeight: 1.4,
+                                        }}
+                                    >
+                                        {exam.title}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>
+                                            {exam.duration_minutes} min
+                                        </span>
+                                        <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>
+                                            {exam.questions_count} questions
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </aside>
     );
 }

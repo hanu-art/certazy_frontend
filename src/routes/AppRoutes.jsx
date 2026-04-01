@@ -24,7 +24,17 @@ import CertificatesPage   from "@/pages/student/CertificatesPage";
 import PaymentHistoryPage from "@/pages/student/PaymentHistoryPage";
 import ProfilePage        from "@/pages/student/ProfilePage";
 import CoursePlayerPage   from "@/pages/student/CoursePlayerPage";
+import ExamInterface      from "@/pages/student/ExamInterface";
+
+// Admin pages
+import AdminDashboard     from "@/pages/admin/AdminDashboard";
+import UsersPage          from "@/pages/admin/UsersPage";
+import AdminCoursesPage   from "@/pages/admin/CoursesPage";
+import CategoriesPage     from "@/pages/admin/CategoriesPage";
+import PaymentsPage       from "@/pages/admin/PaymentsPage";
+
 import ProtectedRoute     from "@/components/shared/ProtectedRoute";
+import AdminLayout        from "@/components/layout/AdminLayout";
 
 // checkout
 import CheckoutPage from "@/pages/student/CheckoutPage/PaymentIndex";
@@ -65,6 +75,8 @@ export default function AppRoutes() {
                     <Route path="certificates" element={<CertificatesPage />} />
                     <Route path="payments"     element={<PaymentHistoryPage />} />
                     <Route path="profile"       element={<ProfilePage />} />
+                    <Route path="course/:courseId/learn" element={<CoursePlayerPage />} />
+                    <Route path="course/:courseId/exam/:testId" element={<ExamInterface />} />
                 </Route>
        
   
@@ -87,7 +99,18 @@ export default function AppRoutes() {
                 />
 
                 {/* ── ADMIN ── */}
-                <Route path="/admin/dashboard" element={<div className="p-8 text-center text-text-secondary">Admin Dashboard coming soon</div>} />
+                <Route path="/admin" element={
+                    <ProtectedRoute allowedRoles={["admin", "sub_admin"]}>
+                        <AdminLayout />
+                    </ProtectedRoute>
+                }>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="users" element={<UsersPage />} />
+                    <Route path="courses" element={<AdminCoursesPage />} />
+                    <Route path="categories" element={<CategoriesPage />} />
+                    <Route path="payments" element={<PaymentsPage />} />
+                    {/* Add other admin routes here as they are created */}
+                </Route>
 
                 {/* ── 404 ── */}
                 <Route path="*" element={
