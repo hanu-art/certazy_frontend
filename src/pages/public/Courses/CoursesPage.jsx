@@ -290,10 +290,10 @@ export default function CoursesPage() {
                 </div>
 
                 {/* Main layout */}
-                <div className="flex gap-6 items-start">
+                <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
 
                     {/* Sidebar — desktop only */}
-                    <div className="hidden lg:block">
+                    <div className="hidden lg:block w-full lg:w-80 flex-shrink-0">
                         <CourseFilters categories={categories} />
                     </div>
 
@@ -302,7 +302,7 @@ export default function CoursesPage() {
 
                         {/* Error */}
                         {error && !loading && (
-                            <div className="bg-white rounded-xl p-8 text-center"
+                            <div className="bg-white rounded-xl p-6 sm:p-8 text-center"
                                 style={{ border: "1px solid #E8ECF4" }}
                             >
                                 <p className="text-[13.5px] text-red-500 mb-2">{error}</p>
@@ -316,7 +316,7 @@ export default function CoursesPage() {
                         )}
 
                         {/* Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
                             {loading
                                 ? Array(pagination.limit || 12).fill(0).map((_, i) => (
                                     <CourseCardSkeleton key={i} />
@@ -329,23 +329,23 @@ export default function CoursesPage() {
 
                         {/* Empty state */}
                         {!loading && !error && courses.length === 0 && (
-                            <div className="bg-white rounded-xl p-16 text-center"
+                            <div className="bg-white rounded-xl p-8 sm:p-12 lg:p-16 text-center"
                                 style={{ border: "1px solid #E8ECF4" }}
                             >
-                                <div className="w-14 h-14 rounded-2xl bg-[#F8FAFC] flex items-center justify-center mx-auto mb-4"
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#F8FAFC] flex items-center justify-center mx-auto mb-4"
                                     style={{ border: "1px solid #E8ECF4" }}
                                 >
-                                    <Search size={22} className="text-text-muted" />
+                                    <Search size={18} className="sm:text-[22px] text-text-muted" />
                                 </div>
-                                <p className="text-[15px] font-bold text-text-primary mb-2">
+                                <p className="text-[14px] sm:text-[15px] font-bold text-text-primary mb-2">
                                     No courses found
                                 </p>
-                                <p className="text-[13px] text-text-muted mb-4">
+                                <p className="text-[12px] sm:text-[13px] text-text-muted mb-4">
                                     Try adjusting your filters or search query
                                 </p>
                                 <button
                                     onClick={() => dispatch(setFilter({ key: "search", value: null }))}
-                                    className="text-[13px] font-semibold text-primary hover:text-primary-hover transition-colors"
+                                    className="text-[12px] sm:text-[13px] font-semibold text-primary hover:text-primary-hover transition-colors"
                                 >
                                     Clear filters →
                                 </button>
