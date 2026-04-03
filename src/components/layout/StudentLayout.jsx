@@ -19,6 +19,7 @@ import {
 import { selectUser } from "@/features/auth/authSlice";
 import { logoutUser } from "@/features/auth/authSlice";
 import { cn } from "@/lib/utils";
+import ProfilePage from "@/pages/student/ProfilePage";
 
 const NAV_ITEMS = [
     { label: "Dashboard",       icon: LayoutDashboard, to: "/student/dashboard"       },
@@ -182,7 +183,6 @@ export default function StudentLayout({ children }) {
                 {/* Page content */}
                 <main className="flex-1 overflow-y-auto">
                    <Outlet/>
-                   {children}
                 </main>
             </div>
         </div>
