@@ -32,9 +32,14 @@ import UsersPage          from "@/pages/admin/UsersPage";
 import AdminCoursesPage   from "@/pages/admin/CoursesPage";
 import CategoriesPage     from "@/pages/admin/CategoriesPage";
 import PaymentsPage       from "@/pages/admin/PaymentsPage";
+import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
 
 import ProtectedRoute     from "@/components/shared/ProtectedRoute";
-import AdminLayout        from "@/components/layout/AdminLayout";
+import AdminLayout        from "@/components/layout/AdminLayout"; 
+
+
+import TestsPage     from "@/pages/admin/TestsPage";
+import QuestionsPage from "@/pages/admin/QuestionsPage";
 
 // checkout
 import CheckoutPage from "@/pages/student/CheckoutPage/PaymentIndex";
@@ -107,8 +112,11 @@ export default function AppRoutes() {
                     <Route path="dashboard" element={<AdminDashboard />} />
                     <Route path="users" element={<UsersPage />} />
                     <Route path="courses" element={<AdminCoursesPage />} />
+                    <Route path="courses/:courseId/curriculum" element={<CurriculumPage />} />
                     <Route path="categories" element={<CategoriesPage />} />
                     <Route path="payments" element={<PaymentsPage />} />
+                    <Route path="courses/:courseId/tests"      element={<TestsPage />} />
+                    <Route path="tests/:testId/questions"       element={<QuestionsPage />} />
                     {/* Add other admin routes here as they are created */}
                 </Route>
 

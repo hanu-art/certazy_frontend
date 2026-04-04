@@ -5,8 +5,9 @@ import {
     BookOpen, Search, Download, Plus, Star,
     Users, Edit2, Trash2, ChevronLeft,
     ChevronRight, X, Save, Loader2,
-    AlertCircle, CheckCircle2,
+    AlertCircle, CheckCircle2, ClipboardList,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import courseService   from "@/services/courseService";
@@ -76,6 +77,7 @@ export default function CoursesPage() {
     const [selectedCourse,  setSelectedCourse]  = useState(null);
 
     const totalPages = Math.ceil(totalCount / PER_PAGE);
+    const navigate = useNavigate();
 
     // ── Category helpers ──────────────────────────────────────────────────────
 
@@ -498,6 +500,18 @@ export default function CoursesPage() {
                                             {/* Actions */}
                                             <td className="py-3.5 px-4">
                                                 <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={() => navigate(`/admin/courses/${course.id}/curriculum`)}
+                                                        className="p-1.5 rounded-lg text-slate-500 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                                                        title="Curriculum">
+                                                        <BookOpen size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => navigate(`/admin/courses/${course.id}/tests`)}
+                                                        className="p-1.5 rounded-lg text-slate-500 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                                                        title="Tests">
+                                                        <ClipboardList size={14} />
+                                                    </button>
                                                     <button onClick={() => openEdit(course)}
                                                         className="p-1.5 rounded-lg text-slate-500 hover:bg-[#EBF4FF] hover:text-[#3282B8] transition-colors"
                                                         title="Edit">
