@@ -27,6 +27,8 @@ Courses · Practice Tests · Certifications · Payments · Admin Panel
 - [API Services](#-api-services)
 - [Auth Flow](#-auth-flow)
 - [Role-Based Access](#-role-based-access)
+- [Key Features](#-key-features)
+- [API Endpoints](#-api-endpoints)
 - [Component Guide](#-component-guide)
 - [Code Rules](#-code-rules)
 - [Pages Overview](#-pages-overview)
@@ -98,6 +100,7 @@ certazy-frontend/
 │   │   ├── certificateService.js
 │   │   ├── reviewService.js
 │   │   ├── notificationService.js
+│   │   ├── contactService.js
 │   │   └── adminService.js
 │   │
 │   ├── pages/
@@ -132,6 +135,8 @@ certazy-frontend/
 │   │       ├── TestsPage.jsx
 │   │       ├── TestFormPage.jsx          # Create / Edit test + questions
 │   │       ├── PaymentsPage.jsx
+│   │       ├── EnrollmentsPage.jsx
+│   │       ├── ContactPage.jsx
 │   │       ├── DiscountsPage.jsx
 │   │       └── CertificatesPage.jsx
 │   │
@@ -285,16 +290,14 @@ VITE_APP_URL=http://localhost:5173
 ```
 /admin/dashboard           → Stats + overview
 /admin/users               → All students list
-/admin/sub-admins          → Sub-admin management (admin only)
 /admin/categories          → Category CRUD
 /admin/courses             → Courses list
 /admin/courses/new         → Create course
 /admin/courses/:id/edit    → Edit course
 /admin/courses/:id/content → Manage sections + lessons
-/admin/tests               → Tests list
-/admin/tests/new           → Create test + add questions
-/admin/tests/:id/edit      → Edit test
-/admin/payments            → All transactions
+/admin/enrollments         → Student enrollment tracking
+/admin/payments            → All transactions + revenue
+/admin/contact             → Customer support tickets
 /admin/discounts           → Discount links management
 /admin/certificates        → Issued certificates
 ```
@@ -503,7 +506,63 @@ export default CourseCard;
 
 ---
 
-## 📄 Pages Overview
+## � Key Features
+
+### Student Experience
+- **Course Discovery**: Browse, search, and filter courses by category, price, and rating
+- **Interactive Learning**: Video lessons, articles, and quizzes with progress tracking
+- **Assessments**: Timed MCQ tests with instant results and detailed explanations
+- **Certificates**: Auto-generated certificates on course completion
+- **Secure Payments**: Razorpay/PayPal integration with multiple payment methods
+
+### Admin Dashboard
+- **Analytics**: Real-time stats for revenue, users, courses, and enrollments
+- **User Management**: Student and sub-admin account management
+- **Content Management**: Course creation, curriculum builder, and test management
+- **Financial Tracking**: Payment history, enrollment tracking, and revenue analytics
+- **Support System**: Customer contact management with status tracking
+
+### Technical Features
+- **Role-Based Access**: Secure authentication with role-based routing
+- **Responsive Design**: Mobile-first design with Tailwind CSS
+- **Real-Time Updates**: Live notifications and dashboard metrics
+- **API Integration**: RESTful API with proper error handling
+- **Performance**: Lazy loading, pagination, and optimized data fetching
+
+---
+
+## 🔌 API Endpoints
+
+### Authentication
+```javascript
+POST /api/v1/auth/register     // Student registration
+POST /api/v1/auth/login        // User login
+POST /api/v1/auth/logout       // User logout
+POST /api/v1/auth/refresh      // Token refresh
+```
+
+### Courses & Learning
+```javascript
+GET    /api/v1/courses               // List courses with filters
+GET    /api/v1/courses/:slug         // Course details
+POST   /api/v1/enrollments           // Enroll in course
+GET    /api/v1/enrollments/my        // My enrollments
+POST   /api/v1/attempts/:testId/start // Start test attempt
+POST   /api/v1/attempts/submit       // Submit test
+```
+
+### Admin Management
+```javascript
+GET    /api/v1/payments/admin/all     // All payments
+GET    /api/v1/enrollments/admin/all  // All enrollments
+GET    /api/v1/contact               // Contact messages
+PUT    /api/v1/contact/:id/status    // Update contact status
+GET    /api/v1/users/admin           // User management
+```
+
+---
+
+## �� Pages Overview
 
 | Page | Auth | Description |
 |---|---|---|
@@ -519,10 +578,14 @@ export default CourseCard;
 | CheckoutPage | ✅ | Course + price + Razorpay integration |
 | CertificatesPage | ✅ | Download/view earned certificates |
 | Admin Dashboard | ✅ | Revenue, users, courses stats + charts |
+| EnrollmentsPage | ✅ | Student enrollment tracking with progress |
+| PaymentsPage | ✅ | Revenue dashboard with transaction history |
+| ContactPage | ✅ | Customer support ticket management |
+| DiscountsPage | ✅ | Send personalised discount links to students |
+| CertificatesPage | ✅ | View and manage issued certificates |
 | CourseFormPage | ✅ | Create/edit course with all fields |
 | SectionsPage | ✅ | Drag-reorder sections + lessons |
 | TestFormPage | ✅ | Build tests, add questions + options |
-| DiscountsPage | ✅ | Send personalised discount links to students |
 
 ---
 
@@ -602,8 +665,81 @@ export default {
 
 ---
 
+## 🚀 Deployment
+
+### Production Build
+```bash
+# Build for production
+npm run build
+
+# Preview build locally
+npm run preview
+```
+
+### Environment Setup
+```bash
+# Production environment variables
+VITE_API_BASE_URL=https://your-backend-api.com/api
+VITE_RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxx
+VITE_GOOGLE_CLIENT_ID=your_production_google_client_id
+VITE_APP_NAME=Certazy
+VITE_APP_URL=https://your-domain.com
+```
+
+### Deployment Platforms
+- **Vercel**: Recommended for React apps
+- **Netlify**: Static hosting with CI/CD
+- **AWS S3 + CloudFront**: Scalable static hosting
+- **Docker**: Containerized deployment
+
+---
+
+## 🤝 Contributing
+
+### Development Workflow
+```bash
+# 1. Fork and clone
+git clone https://github.com/your-username/certazy_frontend.git
+
+# 2. Create feature branch
+git checkout -b feature/your-feature-name
+
+# 3. Install and start
+npm install
+npm run dev
+
+# 4. Make changes following code rules
+# 5. Test thoroughly
+# 6. Commit and push
+git commit -m "feat: add your feature"
+git push origin feature/your-feature-name
+
+# 7. Create Pull Request
+```
+
+### Code Style Guidelines
+- Follow existing code patterns
+- Use TypeScript for new files
+- Write meaningful commit messages
+- Test all changes before PR
+- Update documentation when needed
+
+---
+
+## 📞 Support
+
+For questions or support:
+- Create an issue in the repository
+- Check the documentation first
+- Join our Discord community
+- Email: support@certazy.com
+
+---
+
 <div align="center">
 
 Built with ❤️ — Scalable · Accessible · Production Ready
+
+**⭐ Star this repo if it helped you!**
 
 </div>
