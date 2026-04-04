@@ -14,9 +14,6 @@ import LoginPage     from "@/pages/Auth/LoginPage";
 import RegisterPage  from "@/pages/Auth/RegisterPage";
 import OAuthCallback from "@/pages/Auth/OAuthCallback";
 
-// Contact
-import ContactPage from "@/pages/contact/ContactPage";
-
 // Student pages
 import DashboardPage      from "@/pages/student/DashboardPage";
 import MyCoursesPage      from "@/pages/student/MyCoursesPage";
@@ -31,8 +28,12 @@ import AdminDashboard     from "@/pages/admin/AdminDashboard";
 import UsersPage          from "@/pages/admin/UsersPage";
 import AdminCoursesPage   from "@/pages/admin/CoursesPage";
 import CategoriesPage     from "@/pages/admin/CategoriesPage";
-import PaymentsPage       from "@/pages/admin/PaymentsPage";
+
 import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
+import EnrollmentsPage    from "@/pages/admin/EnrollmentsPage";
+import ContactPage        from "@/pages/admin/ContactPage";
+
+import PaymentsPage_new   from "@/pages/admin/PaymentsPage_new";
 
 import ProtectedRoute     from "@/components/shared/ProtectedRoute";
 import AdminLayout        from "@/components/layout/AdminLayout"; 
@@ -62,7 +63,6 @@ export default function AppRoutes() {
                 <Route path="/" element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
                 <Route path="/courses"      element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CourseDetailPage />} />
-                <Route path="/contact"      element={<ContactPage />} />
 
                 {/* ── AUTH ── */}
                 <Route path="/login"          element={<LoginPage />} />
@@ -114,7 +114,9 @@ export default function AppRoutes() {
                     <Route path="courses" element={<AdminCoursesPage />} />
                     <Route path="courses/:courseId/curriculum" element={<CurriculumPage />} />
                     <Route path="categories" element={<CategoriesPage />} />
-                    <Route path="payments" element={<PaymentsPage />} />
+                   <Route path="payments" element={<PaymentsPage_new />} />
+                    <Route path="enrollments" element={<EnrollmentsPage />} />
+                    <Route path="contact" element={<ContactPage />} />
                     <Route path="courses/:courseId/tests"      element={<TestsPage />} />
                     <Route path="tests/:testId/questions"       element={<QuestionsPage />} />
                     {/* Add other admin routes here as they are created */}

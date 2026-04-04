@@ -32,11 +32,7 @@ const ADMIN_NAV_ITEMS = [
     { label: "Permissions", icon: Shield, to: "/admin/permissions" },
     { label: "Categories", icon: Tag, to: "/admin/categories" },
     { label: "Courses", icon: BookOpen, to: "/admin/courses" },
-    { label: "Sections", icon: FileText, to: "/admin/sections" },
-    { label: "Lessons", icon: FileText, to: "/admin/lessons" },
-    { label: "Tests", icon: TestTube, to: "/admin/tests" },
-    { label: "Questions", icon: HelpCircle, to: "/admin/questions" },
-    { label: "Options", icon: FileText, to: "/admin/options" },
+ 
     { label: "Enrollments", icon: Users, to: "/admin/enrollments" },
     { label: "Payments", icon: CreditCard, to: "/admin/payments" },
     { label: "Discounts", icon: Percent, to: "/admin/discounts" },

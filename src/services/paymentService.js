@@ -5,9 +5,6 @@ import api from "./api";
  *
  * Base: /api/v1/payments
  *
- * IMPORTANT: Most endpoints are student-only and return 403 for admins
- * Admin functionality needs to be implemented in backend
- *
  * STUDENT:
  *   GET  /api/v1/payments/history           → payment history (student only)
  *   POST /api/v1/payments/razorpay/create-order
@@ -15,14 +12,12 @@ import api from "./api";
  *   POST /api/v1/payments/paypal/create-order
  *   POST /api/v1/payments/paypal/capture
  *
- * ADMIN (NOT IMPLEMENTED YET):
- *   GET  /api/v1/payments/admin/all       → all payments with filters (TODO)
- *   GET  /api/v1/payments/admin/recent    → recent payments (TODO)
- *   PUT  /api/v1/payments/admin/:id/status → update payment status (TODO)
+ * ADMIN:
+ *   GET  /api/v1/payments/admin/all       → all payments with filters
  */
 
 const paymentService = {
-    getMyPayments: ()       => api.get("/v1/payments/history"),
+    getMyPayments: () => api.get("/v1/payments/history"),
 
     // Razorpay
     razorpayCreateOrder: (data) => api.post("/v1/payments/razorpay/create-order", data),
@@ -32,60 +27,23 @@ const paymentService = {
     paypalCreateOrder: (data) => api.post("/v1/payments/paypal/create-order", data),
     paypalCapture:     (data) => api.post("/v1/payments/paypal/capture",       data),
 
-    // Admin only (fallbacks - will return 403, need backend implementation)
-    getAllPayments: async (params = {}) => {
-        try {
-            return await api.get("/v1/payments/history", { params });
-        } catch (error) {
-            if (error.response?.status === 403) {
-                // Return mock data when endpoint is not available for admins
-                return { 
-                    data: { 
-                        payments: [
-                            { id: 1, userName: 'John Doe', courseName: 'React Course', amount: 999, status: 'completed', createdAt: new Date().toISOString() },
-                            { id: 2, userName: 'Jane Smith', courseName: 'Node.js Course', amount: 1299, status: 'completed', createdAt: new Date().toISOString() },
-                        ] 
-                    } 
-                };
-            }
-            throw error;
-        }
+    // Admin endpoint as specified
+    getAllPayments: (params = {}) => {
+        // Support ?status=success, ?method=razorpay filters
+        const queryParams = new URLSearchParams();
+        if (params.status) queryParams.append('status', params.status);
+        if (params.method) queryParams.append('method', params.method);
+        if (params.search) queryParams.append('search', params.search);
+        if (params.page) queryParams.append('page', params.page);
+        if (params.limit) queryParams.append('limit', params.limit);
+        if (params.currency) queryParams.append('currency', params.currency);
+        
+        const url = `/v1/payments/admin/all${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+        return api.get(url);
     },
     
-    getRecentPayments: async (limit = 10) => {
-        try {
-            console.log("Trying to get recent payments...");
-            const response = await api.get(`/v1/payments/history?limit=${limit}`);
-            console.log("Payments response:", response);
-            return response;
-        } catch (error) {
-            console.log("Payment service error:", error.response?.status);
-            if (error.response?.status === 403) {
-                console.log("Returning mock payment data for admin...");
-                // Return mock data when endpoint is not available for admins
-                return { 
-                    data: { 
-                        payments: [
-                            { id: 1, userName: 'John Doe', courseName: 'React Course', amount: 999, status: 'completed', createdAt: new Date().toISOString() },
-                            { id: 2, userName: 'Jane Smith', courseName: 'Node.js Course', amount: 1299, status: 'completed', createdAt: new Date().toISOString() },
-                        ] 
-                    } 
-                };
-            }
-            throw error;
-        }
-    },
-    
-    updatePaymentStatus: async (id, status) => {
-        try {
-            return await api.put(`/v1/payments/${id}/status`, { status });
-        } catch (error) {
-            if (error.response?.status === 403) {
-                console.log(`Payment status update not available for admins (ID: ${id}, Status: ${status})`);
-                return { data: { success: true } };
-            }
-            throw error;
-        }
+    getRecentPayments: (limit = 10) => {
+        return api.get(`/v1/payments/admin/all?limit=${limit}`);
     },
 };
 

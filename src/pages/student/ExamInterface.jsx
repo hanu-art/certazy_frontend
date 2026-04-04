@@ -36,49 +36,23 @@ export default function ExamInterface() {
         try {
             setLoading(true);
             
-            // Get exam details
-            const examRes = await testService.getTestFull(testId);
-            const examData = examRes.data?.data?.test;
-            setExam(examData);
-            setTimeLeft(examData.duration_minutes * 60);
-
-            // Get questions with options
-            const questionsRes = await questionService.getByTestId(testId);
-            const questionsData = questionsRes.data?.data?.questions || [];
-            
-            // Group options by question
-            const questionsWithOptions = questionsData.reduce((acc, row) => {
-                if (!acc[row.id]) {
-                    acc[row.id] = {
-                        id: row.id,
-                        test_id: row.test_id,
-                        question: row.question,
-                        type: row.type,
-                        explanation: row.explanation,
-                        difficulty: row.difficulty,
-                        topic_tag: row.topic_tag,
-                        order_num: row.order_num,
-                        options: []
-                    };
-                }
-                
-                if (row.option_id) {
-                    acc[row.id].options.push({
-                        id: row.option_id,
-                        option_text: row.option_text,
-                        order_num: row.option_order,
-                        is_correct: false // Will be set by backend
-                    });
-                }
-                
-                return acc;
-            }, {});
-
-            setQuestions(Object.values(questionsWithOptions).sort((a, b) => a.order_num - b.order_num));
-
-            // Start exam attempt
+            // Start exam attempt first to get attempt_id and questions
             const attemptRes = await testService.startAttempt(testId);
-            setAttemptId(attemptRes.data?.data?.attempt_id);
+            const attemptData = attemptRes.data?.data;
+            
+            if (!attemptData) {
+                throw new Error("Failed to start exam attempt");
+            }
+
+            // Set attempt ID and timer from attempt response
+            setAttemptId(attemptData.attempt_id);
+            setTimeLeft(attemptData.test.duration * 60); // duration in minutes to seconds
+            
+            // Set exam details from attempt response
+            setExam(attemptData.test);
+            
+            // Set questions from attempt response
+            setQuestions(attemptData.questions || []);
 
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to load exam");
@@ -123,13 +97,18 @@ export default function ExamInterface() {
         try {
             setSubmitting(true);
             
+            // Convert answers to required API format
+            const formattedAnswers = Object.entries(answers).map(([questionId, selectedOpts]) => ({
+                question_id: parseInt(questionId),
+                selected_opts: Array.isArray(selectedOpts) ? selectedOpts : [selectedOpts]
+            }));
+
             const submitData = {
                 attempt_id: attemptId,
-                answers: answers,
-                time_taken: (exam.duration_minutes * 60) - timeLeft
+                answers: formattedAnswers
             };
 
-            const resultRes = await testService.submitExam(testId, submitData);
+            const resultRes = await testService.submitExam(submitData);
             const resultData = resultRes.data?.data;
             
             setResults(resultData);
