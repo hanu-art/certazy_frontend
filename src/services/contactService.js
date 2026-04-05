@@ -26,4 +26,4 @@ const contactService = {
   updateStatus: (id, status) => api.put(`/v1/contact/${id}/status`, { status }),
 };
 
-export default contactService;
+export default contactService

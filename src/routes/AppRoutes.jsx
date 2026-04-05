@@ -8,6 +8,7 @@ import StudentLayout    from "@/components/layout/StudentLayout";
 // Public pages
 import CoursesPage      from "@/pages/public/Courses/CoursesPage";
 import CourseDetailPage from "@/pages/public/CourseDetail/CourseDetailIndex";
+import ContactPagePublic from "@/pages/contact/ContactPagePublic";
 
 // Auth pages
 import LoginPage     from "@/pages/Auth/LoginPage";
@@ -32,6 +33,9 @@ import CategoriesPage     from "@/pages/admin/CategoriesPage";
 import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
 import EnrollmentsPage    from "@/pages/admin/EnrollmentsPage";
 import ContactPage        from "@/pages/admin/ContactPage";
+
+// Public pages
+import PublicContactPage  from "@/pages/contact/ContactPagePublic";
 
 import PaymentsPage_new   from "@/pages/admin/PaymentsPage_new";
 
@@ -63,6 +67,7 @@ export default function AppRoutes() {
                 <Route path="/" element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
                 <Route path="/courses"      element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CourseDetailPage />} />
+                <Route path="/contact-us"   element={<ContactPagePublic />} />
 
                 {/* ── AUTH ── */}
                 <Route path="/login"          element={<LoginPage />} />

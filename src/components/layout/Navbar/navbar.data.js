@@ -15,7 +15,7 @@ export const NAV_LINKS = [
 // ── "More" dropdown items ──────────────────────────────────
 export const MORE_ITEMS = [
     { label: "About Us", to: "/about" },
-    { label: "Contact", to: "/contact" },
+    { label: "Contact", to: "/contact-us" },
     { divider: true },
     { label: "Help Center", to: "/help" },
 ];

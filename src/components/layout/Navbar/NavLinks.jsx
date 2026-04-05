@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 // Items that go into More dropdown — keyed by when they collapse
 const BLOG = { label: "Blog", to: "/blog", icon: BookOpen, desc: "Tips, guides & resources" };
 const ABOUT = { label: "About Us", to: "/about", icon: Info, desc: "Our story and mission" };
-const CONTACT = { label: "Contact", to: "/contact", icon: Mail, desc: "Get in touch with us" };
+const CONTACT = { label: "Contact", to: "/contact-us", icon: Mail, desc: "Get in touch with us" };
 const HELP = { label: "Help Center", to: "/help", icon: HelpCircle, desc: "FAQs and support" };
 
 export default function NavLinks({ megaOpen, onToggleMega, navH = "h-[70px]" }) {
@@ -47,7 +47,7 @@ export default function NavLinks({ megaOpen, onToggleMega, navH = "h-[70px]" }) 
 
             {/* Contact — visible from xl+ */}
             <span className="hidden xl:block">
-                <NavLink to="/contact" label="Contact" isActive={pathname === "/contact"} navH={navH} />
+                <NavLink to="/contact-us" label="Contact" isActive={pathname === "/contact"} navH={navH} />
             </span>
 
             {/* More — md: Blog+About+Contact+Help, lg: About+Contact+Help, xl: hidden */}

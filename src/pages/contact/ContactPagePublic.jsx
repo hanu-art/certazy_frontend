@@ -3,7 +3,7 @@
 import ContactHero from "./ContactHero";
 import ContactForm from "./ContactForm";
 
-export default function ContactPage() {
+export default function ContactPagePublic() {
   return (
     <div style={{
       minHeight: "100vh",
