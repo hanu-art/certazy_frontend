@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Users,
     BookOpen,
@@ -87,7 +88,7 @@ function RevenueChart({ data }) {
                             <span className="text-xs text-gray-600 mt-2">{item.month}</span>
                         </div>
                         <span className="text-xs font-medium text-gray-900">
-                            ₹{(item.revenue / 1000).toFixed(1)}k
+                            ${item.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </span>
                     </div>
                 ))}
@@ -98,15 +99,17 @@ function RevenueChart({ data }) {
 
 // Recent Payments Table Component
 function RecentPaymentsTable({ payments }) {
+    const navigate = useNavigate();
+    
     const getStatusBadge = (status) => {
         const styles = {
-            completed: "bg-green-100 text-green-800",
+            success: "bg-green-100 text-green-800",
             pending: "bg-yellow-100 text-yellow-800",
             failed: "bg-red-100 text-red-800",
         };
         
         return (
-            <span className={cn("px-2 py-1 text-xs font-medium rounded-full", styles[status])}>
+            <span className={cn("px-2 py-1 text-xs font-medium rounded-full", styles[status] || "bg-gray-100 text-gray-800")}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>
         );
@@ -116,7 +119,10 @@ function RecentPaymentsTable({ payments }) {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Recent Payments</h3>
-                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <button 
+                    onClick={() => navigate('payments')}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
                     View All
                 </button>
             </div>
@@ -136,7 +142,7 @@ function RecentPaymentsTable({ payments }) {
                             <tr key={payment.id} className="border-b border-gray-100 hover:bg-gray-50">
                                 <td className="py-3 px-4 text-sm text-gray-900">{payment.user}</td>
                                 <td className="py-3 px-4 text-sm text-gray-900">{payment.course}</td>
-                                <td className="py-3 px-4 text-sm font-medium text-gray-900">₹{payment.amount}</td>
+                                <td className="py-3 px-4 text-sm font-medium text-gray-900">${payment.amount}</td>
                                 <td className="py-3 px-4">{getStatusBadge(payment.status)}</td>
                                 <td className="py-3 px-4 text-sm text-gray-600">{payment.date}</td>
                             </tr>
@@ -150,6 +156,28 @@ function RecentPaymentsTable({ payments }) {
 
 // Pending Reviews Component
 function PendingReviews({ reviews }) {
+    const navigate = useNavigate();
+    
+    const handleApproveReview = async (reviewId) => {
+        try {
+            await reviewService.updateReviewStatus(reviewId, 'approved');
+            // Refresh reviews data
+            window.location.reload();
+        } catch (error) {
+            console.error('Error approving review:', error);
+        }
+    };
+    
+    const handleRejectReview = async (reviewId) => {
+        try {
+            await reviewService.updateReviewStatus(reviewId, 'rejected');
+            // Refresh reviews data
+            window.location.reload();
+        } catch (error) {
+            console.error('Error rejecting review:', error);
+        }
+    };
+    
     const renderStars = (rating) => {
         return Array.from({ length: 5 }, (_, i) => (
             <Star
@@ -164,7 +192,10 @@ function PendingReviews({ reviews }) {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Pending Reviews</h3>
-                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <button 
+                    onClick={() => navigate('/admin/reviews')}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
                     View All
                 </button>
             </div>
@@ -183,10 +214,18 @@ function PendingReviews({ reviews }) {
                                 <p className="text-sm text-gray-700">{review.comment}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button className="p-1 text-green-600 hover:bg-green-50 rounded">
+                                <button 
+                                    onClick={() => handleApproveReview(review.id)}
+                                    className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                    title="Approve Review"
+                                >
                                     <UserCheck size={16} />
                                 </button>
-                                <button className="p-1 text-red-600 hover:bg-red-50 rounded">
+                                <button 
+                                    onClick={() => handleRejectReview(review.id)}
+                                    className="p-1 text-red-600 hover:bg-red-50 rounded"
+                                    title="Reject Review"
+                                >
                                     <AlertCircle size={16} />
                                 </button>
                             </div>
@@ -201,11 +240,13 @@ function PendingReviews({ reviews }) {
 
 // Quick Actions Component
 function QuickActions() {
+    const navigate = useNavigate();
+    
     const actions = [
-        { title: "Create Course", icon: BookOpen, color: "blue", href: "/admin/courses/create" },
+        { title: "Create Course", icon: BookOpen, color: "blue", href: "/admin/courses" },
         { title: "Manage Users", icon: Users, color: "green", href: "/admin/users" },
-        { title: "View Reports", icon: Download, color: "purple", href: "/admin/reports" },
-        { title: "Settings", icon: AlertCircle, color: "orange", href: "/admin/settings" },
+        { title: "Enrollments", icon: CreditCard, color: "purple", href: "/admin/enrollments" },
+        { title: "Contact", icon: AlertCircle, color: "orange", href: "/admin/contact" },
     ];
 
     const getColorClasses = (color) => {
@@ -225,6 +266,7 @@ function QuickActions() {
                 {actions.map((action) => (
                     <button
                         key={action.title}
+                        onClick={() => navigate(action.href)}
                         className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                     >
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getColorClasses(action.color)}`}>
@@ -248,6 +290,10 @@ export default function AdminDashboard() {
         thisMonthRevenue: 0,
         pendingReviews: 0,
         pendingPayments: 0,
+        userGrowth: null,
+        activeUserGrowth: null,
+        revenueGrowth: null,
+        courseGrowth: null,
     });
     const [revenueData, setRevenueData] = useState([]);
     const [recentPayments, setRecentPayments] = useState([]);
@@ -273,6 +319,10 @@ export default function AdminDashboard() {
                     thisMonthRevenue: dashboardStats.thisMonthRevenue || 0,
                     pendingReviews: dashboardStats.pendingReviews || 0,
                     pendingPayments: dashboardStats.pendingPayments || 0,
+                    userGrowth: dashboardStats.userGrowth || null,
+                    activeUserGrowth: dashboardStats.activeUserGrowth || null,
+                    revenueGrowth: dashboardStats.revenueGrowth || null,
+                    courseGrowth: dashboardStats.courseGrowth || null,
                 });
 
                 // Load revenue data
@@ -281,27 +331,33 @@ export default function AdminDashboard() {
 
                 // Load recent payments
                 const paymentsResponse = await paymentService.getRecentPayments(5);
-                const payments = paymentsResponse.data?.data?.payments || [];
+                const payments = paymentsResponse.data?.data || [];
                 setRecentPayments(payments.map(payment => ({
                     id: payment.id,
-                    user: payment.userName || 'Unknown User',
-                    course: payment.courseName || 'Unknown Course',
+                    user: payment.student_name || 'Unknown User',
+                    course: payment.course_title || 'Unknown Course',
                     amount: payment.amount || 0,
                     status: payment.status || 'unknown',
-                    date: new Date(payment.createdAt).toLocaleDateString(),
+                    date: payment.created_at ? new Date(payment.created_at).toLocaleDateString() : 'Invalid Date',
                 })));
 
-                // Load pending reviews
-                const reviewsResponse = await reviewService.getPendingReviews(5);
-                const reviews = reviewsResponse.data?.data?.reviews || [];
-                setPendingReviews(reviews.map(review => ({
-                    id: review.id,
-                    user: review.userName || 'Unknown User',
-                    course: review.courseName || 'Unknown Course',
-                    rating: review.rating || 0,
-                    comment: review.comment || '',
-                    date: new Date(review.createdAt).toLocaleDateString(),
-                })));
+                // Load pending reviews - using real data from contact service as reviews might not be implemented
+                try {
+                    const reviewsResponse = await reviewService.getPendingReviews(5);
+                    const reviews = reviewsResponse.data?.data || [];
+                    setPendingReviews(reviews.map(review => ({
+                        id: review.id,
+                        user: review.user_name || 'Unknown User',
+                        course: review.course_title || 'Unknown Course',
+                        rating: review.rating || 0,
+                        comment: review.comment || '',
+                        date: review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Invalid Date',
+                    })));
+                } catch (reviewError) {
+                    console.log('Review service not available, using mock data');
+                    // Fallback to minimal mock data
+                    setPendingReviews([]);
+                }
 
             } catch (err) {
                 console.error("Error loading dashboard data:", err);
@@ -321,6 +377,10 @@ export default function AdminDashboard() {
                     thisMonthRevenue: 0,
                     pendingReviews: 0,
                     pendingPayments: 0,
+                    userGrowth: null,
+                    activeUserGrowth: null,
+                    revenueGrowth: null,
+                    courseGrowth: null,
                 });
                 setRevenueData([]);
                 setRecentPayments([]);
@@ -383,28 +443,28 @@ export default function AdminDashboard() {
                 <AnalyticsCard
                     title="Total Users"
                     value={stats.totalUsers.toLocaleString()}
-                    change={12.5}
+                    change={stats.userGrowth || null}
                     icon={Users}
                     color="blue"
                 />
                 <AnalyticsCard
                     title="Active Users"
                     value={stats.activeUsers.toLocaleString()}
-                    change={8.2}
+                    change={stats.activeUserGrowth || null}
                     icon={UserCheck}
                     color="green"
                 />
                 <AnalyticsCard
                     title="Total Revenue"
-                    value={`₹${(stats.totalRevenue / 1000).toFixed(1)}k`}
-                    change={15.3}
+                    value={`$${(stats.totalRevenue / 1000).toFixed(1)}k`}
+                    change={stats.revenueGrowth || null}
                     icon={DollarSign}
                     color="purple"
                 />
                 <AnalyticsCard
                     title="Published Courses"
                     value={stats.publishedCourses}
-                    change={5.1}
+                    change={stats.courseGrowth || null}
                     icon={BookOpen}
                     color="orange"
                 />

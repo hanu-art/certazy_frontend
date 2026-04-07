@@ -29,7 +29,7 @@ import { tokens } from "@/styles/token";
 const ADMIN_NAV_ITEMS = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/admin/dashboard" },
     { label: "Users", icon: Users, to: "/admin/users" },
-    { label: "Permissions", icon: Shield, to: "/admin/permissions" },
+
     { label: "Categories", icon: Tag, to: "/admin/categories" },
     { label: "Courses", icon: BookOpen, to: "/admin/courses" },
  
@@ -51,7 +51,7 @@ export default function AdminLayout({ children }) {
 
     const handleLogout = async () => {
         await dispatch(logoutUser());
-        navigate("/login");
+        navigate("/");
     };
 
     return (

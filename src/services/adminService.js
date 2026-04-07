@@ -75,6 +75,14 @@ const adminService = {
     getUserById: (id) => api.get(`/v1/auth/users/${id}`),
     updateUserStatus: (id, data) => api.put(`/v1/auth/users/${id}/status`, data),
     
+    // Sub-Admin Management
+    createSubAdmin: (data) => api.post("/v1/admin/sub-admins/create", data),
+    
+    // Permissions Management
+    getPermissions: (userId) => api.get(`/v1/admin/permissions/${userId}`),
+    updatePermissions: (userId, data) => api.put(`/v1/admin/permissions/${userId}`, data),
+    deletePermissions: (userId) => api.delete(`/v1/admin/permissions/${userId}`),
+    
     // Courses - using existing course endpoints
     getCourses: (params = {}) => api.get("/v1/courses", { params }),
     getCourseById: (id) => api.get(`/v1/courses/${id}`),

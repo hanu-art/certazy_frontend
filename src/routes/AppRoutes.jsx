@@ -56,10 +56,11 @@ export default function AppRoutes() {
 
     const isAuthPage    = AUTH_PATHS.includes(pathname);
     const isStudentPage = pathname.startsWith("/student");
+    const isAdminPage   = pathname.startsWith("/admin");
 
     return (
         <>
-            {!isAuthPage && !isStudentPage && <NavBarIndex />}
+            {!isAuthPage && !isStudentPage && !isAdminPage && <NavBarIndex />}
 
             <Routes>
 

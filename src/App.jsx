@@ -16,6 +16,9 @@ export default function App() {
         }
     }, []);
 
+    // Check if current path is admin
+    const isAdminPage = window.location.pathname.startsWith('/admin');
+
     return (
         <>
             <Toaster
@@ -31,7 +34,7 @@ export default function App() {
             />
             <RouterProgress />
             <AppRoutes />
-            <Footer />
+            {!isAdminPage && <Footer />}
         </>
     );
 }

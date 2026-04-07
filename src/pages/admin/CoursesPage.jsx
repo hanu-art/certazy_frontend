@@ -676,7 +676,7 @@ export default function CoursesPage() {
 
                             {/* Price + Level + Language + Status */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                <Field label="PRICE (₹)">
+                                <Field label="PRICE ($)">
                                     <input type="number" min={0} value={form.price}
                                         onChange={e => setF("price", e.target.value)}
                                         className={inputCls} placeholder="0" />
