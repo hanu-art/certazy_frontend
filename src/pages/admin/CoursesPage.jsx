@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import courseService   from "@/services/courseService";
 import categoryService from "@/services/categoryService";
+import { VideoUpload } from "@/components/admin/VideoUpload";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ const EMPTY_FORM = {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const fmt      = (n) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n;
-const fmtPrice = (p) => (p == null || p === 0) ? "Free" : `₹${Number(p).toLocaleString("en-IN")}`;
+const fmtPrice = (p) => (p == null || p === 0) ? "Free" : `$${Number(p).toLocaleString("en-US")}`;
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -667,10 +668,24 @@ export default function CoursesPage() {
                                         onChange={e => setF("thumbnail", e.target.value)}
                                         className={inputCls} placeholder="https://..." />
                                 </Field>
-                                <Field label="PREVIEW VIDEO URL">
-                                    <input type="url" value={form.preview_video}
-                                        onChange={e => setF("preview_video", e.target.value)}
-                                        className={inputCls} placeholder="https://..." />
+                                <Field label="PREVIEW VIDEO">
+                                    <div className="space-y-3">
+                                        {/* New Video Upload Component */}
+                                        <VideoUpload 
+                                            onUploadComplete={(videoUrl) => {
+                                                setF("preview_video", videoUrl);
+                                            }}
+                                            onUploadError={(error) => {
+                                                console.error('Preview video upload failed:', error);
+                                            }}
+                                        />
+                                        
+                                        {/* Fallback Manual URL Input */}
+                                        <div className="text-center text-xs text-slate-500 my-2">OR</div>
+                                        <input type="url" value={form.preview_video}
+                                            onChange={e => setF("preview_video", e.target.value)}
+                                            className={inputCls} placeholder="Paste video URL manually..." />
+                                    </div>
                                 </Field>
                             </div>
 

@@ -13,6 +13,9 @@ import { selectIsLoggedIn, selectUser } from "@/features/auth/authSlice";
 
 import CourseCurriculum from "./CourseCurriculum";
 import CourseEnrollCard from "./CourseEnrollCard";
+import ReviewList from "@/components/student/ReviewList";
+import ReviewStats from "@/components/student/ReviewStats";
+import ReviewForm from "@/components/student/ReviewForm";
 import { cn }           from "@/lib/utils";
 
 export default function CourseDetailIndex() {
@@ -367,6 +370,30 @@ export default function CourseDetailIndex() {
                                         </p>
                                     </div>
                                 ))}
+                            </div>
+                        </ContentCard>
+                    </div>
+
+                    {/* ── Reviews Section ───────────────────────────── */}
+                    <div className="flex-1 space-y-5">
+                        <ContentCard title="Student Reviews">
+                            <div className="space-y-6">
+                                {/* Review Stats */}
+                                <ReviewStats courseId={course?.id} />
+                                
+                                {/* Review Form - Only show if enrolled */}
+                                {isEnrolled && (
+                                    <ReviewForm 
+                                        courseId={course?.id} 
+                                        onReviewSubmitted={() => {
+                                            // Refresh reviews after submission
+                                            // This will trigger a re-render of ReviewList
+                                        }}
+                                    />
+                                )}
+                                
+                                {/* Reviews List */}
+                                <ReviewList courseId={course?.id} />
                             </div>
                         </ContentCard>
                     </div>

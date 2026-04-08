@@ -20,9 +20,11 @@ const discountService = {
     // Public
     getAll: () => api.get("/v1/discounts"),
     getByCode: (code) => api.get(`/v1/discounts/${code}`),
+    verifyToken: (token) => api.get(`/v1/discounts/verify/${token}`),
 
     // Admin only
     create: (data) => api.post("/v1/discounts/", data),
+    createDiscountLink: (data) => api.post("/v1/discounts", data),
     getAllAdmin: () => api.get("/v1/discounts/"),
     update: (id, data) => api.put(`/v1/discounts/${id}`, data),
     delete: (id) => api.delete(`/v1/discounts/${id}`),

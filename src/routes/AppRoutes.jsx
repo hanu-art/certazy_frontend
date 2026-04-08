@@ -29,7 +29,7 @@ import AdminDashboard     from "@/pages/admin/AdminDashboard";
 import UsersPage          from "@/pages/admin/UsersPage";
 import AdminCoursesPage   from "@/pages/admin/CoursesPage";
 import CategoriesPage     from "@/pages/admin/CategoriesPage";
-
+import ReviewsManagementPage from "@/pages/admin/ReviewsManagementPage";
 import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
 import EnrollmentsPage    from "@/pages/admin/EnrollmentsPage";
 import ContactPage        from "@/pages/admin/ContactPage";
@@ -41,7 +41,7 @@ import PaymentsPage_new   from "@/pages/admin/PaymentsPage_new";
 
 import ProtectedRoute     from "@/components/shared/ProtectedRoute";
 import AdminLayout        from "@/components/layout/AdminLayout"; 
-
+import DiscountsPage     from "@/pages/admin/DiscountsPage";
 
 import TestsPage     from "@/pages/admin/TestsPage";
 import QuestionsPage from "@/pages/admin/QuestionsPage";
@@ -120,8 +120,10 @@ export default function AppRoutes() {
                     <Route path="courses" element={<AdminCoursesPage />} />
                     <Route path="courses/:courseId/curriculum" element={<CurriculumPage />} />
                     <Route path="categories" element={<CategoriesPage />} />
-                   <Route path="payments" element={<PaymentsPage_new />} />
+                    <Route path="reviews" element={<ReviewsManagementPage />} />
+                    <Route path="payments" element={<PaymentsPage_new />} />
                     <Route path="enrollments" element={<EnrollmentsPage />} />
+                    <Route path="discounts" element={<DiscountsPage />} />
                     <Route path="contact" element={<ContactPage />} />
                     <Route path="courses/:courseId/tests"      element={<TestsPage />} />
                     <Route path="tests/:testId/questions"       element={<QuestionsPage />} />
