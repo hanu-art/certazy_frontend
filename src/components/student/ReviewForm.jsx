@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Star, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import reviewService from "@/services/reviewService";
 
 // ─── Interactive Rating Stars Component ─────────────────────────────────────
 const InteractiveRatingStars = ({ rating, onRatingChange, size = 24 }) => {
@@ -56,9 +57,6 @@ export default function ReviewForm({ courseId, onReviewSubmitted, className }) {
 
         setIsSubmitting(true);
         try {
-            // Import dynamically to avoid circular dependencies
-            const { default: reviewService } = await import("@/services/reviewService");
-            
             await reviewService.createReview({
                 course_id: courseId,
                 rating: formData.rating,

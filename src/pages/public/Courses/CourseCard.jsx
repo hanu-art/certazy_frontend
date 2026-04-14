@@ -64,7 +64,7 @@ export default function CourseCard({ course }) {
     const {
         id,
         title        = "",
-        slug,
+        slug = "", // Add fallback for missing slug
         thumbnail,           // backend se aayega — null hone pe fallback
         price,
         level,
@@ -87,7 +87,7 @@ export default function CourseCard({ course }) {
 
     return (
         <Link
-            to={`/courses/${slug}`}
+            to={slug ? `/courses/${slug}` : `/courses/${id}`}
             className="group bg-white rounded-2xl overflow-hidden flex flex-col cursor-pointer"
             style={{
                 border: "1px solid #EEF2F7",

@@ -35,10 +35,10 @@ export default function CourseDetailIndex() {
             try {
                 setLoading(true);
                 const { data: cd } = await courseService.getBySlug(slug);
-                const c = cd.data.course;
+                const c = cd?.data?.course;
                 setCourse(c);
                 const { data: sd } = await sectionService.getByCourseId(c.id);
-                setSections(sd.data.sections);
+                setSections(sd?.data?.sections || []);
             } catch (err) {
                 setError(err.response?.data?.message || "Course not found");
             } finally {
@@ -383,7 +383,7 @@ export default function CourseDetailIndex() {
                                 
                                 {/* Review Form - Only show if enrolled */}
                                 {isEnrolled && (
-                                    <ReviewForm 
+                                  <ReviewForm 
                                         courseId={course?.id} 
                                         onReviewSubmitted={() => {
                                             // Refresh reviews after submission

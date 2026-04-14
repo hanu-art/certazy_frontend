@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Star, TrendingUp, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import reviewService from "@/services/reviewService";
 
 // ─── Rating Stars Component ───────────────────────────────────────────────────
 const RatingStars = ({ rating, size = 20 }) => {
@@ -37,8 +39,6 @@ export default function ReviewStats({ courseId, className }) {
             
             setLoading(true);
             try {
-                // Import dynamically to avoid circular dependencies
-                const { default: reviewService } = await import("@/services/reviewService");
                 const response = await reviewService.getCourseReviews(courseId);
                 const reviews = response?.data?.reviews || [];
                 

@@ -20,7 +20,7 @@ import api from "./api";
 
 const reviewService = {
     // Public
-    getCourseReviews: (courseId, params = {}) => api.get(`/v1/reviews/course/${courseId}`, { params }),
+    getCourseReviews: (courseId, params = {}) => api.get(`/v1/reviews/${courseId}`, { params }),
     createReview: (data) => api.post("/v1/reviews/create", data),
 
     // Admin only (fallbacks - will return 403, need backend implementation)

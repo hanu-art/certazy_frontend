@@ -10,6 +10,9 @@ import CoursesPage      from "@/pages/public/Courses/CoursesPage";
 import CourseDetailPage from "@/pages/public/CourseDetail/CourseDetailIndex";
 import ContactPagePublic from "@/pages/contact/ContactPagePublic";
 
+import Home from "@/pages/public/HomePage/Home";
+import About from "@/pages/public/AboutCompany/About";
+
 // Auth pages
 import LoginPage     from "@/pages/Auth/LoginPage";
 import RegisterPage  from "@/pages/Auth/RegisterPage";
@@ -59,16 +62,17 @@ export default function AppRoutes() {
     const isAdminPage   = pathname.startsWith("/admin");
 
     return (
-        <>
+        <> 
             {!isAuthPage && !isStudentPage && !isAdminPage && <NavBarIndex />}
 
             <Routes>
 
                 {/* ── PUBLIC ── */}
-                <Route path="/" element={<div className="p-8 text-center text-text-secondary">HomePage coming soon</div>} />
+                <Route path="/" element={<Home />} />
                 <Route path="/courses"      element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CourseDetailPage />} />
                 <Route path="/contact-us"   element={<ContactPagePublic />} />
+                <Route path="/about"   element={<About />} />
 
                 {/* ── AUTH ── */}
                 <Route path="/login"          element={<LoginPage />} />
