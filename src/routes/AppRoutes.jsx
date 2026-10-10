@@ -48,8 +48,8 @@ import AdminLayout        from "@/components/layout/AdminLayout";
 import DiscountsPage     from "@/pages/admin/DiscountsPage";
 
 import TestsPage     from "@/pages/admin/TestsPage";
-import QuestionsPage from "@/pages/admin/QuestionsPage";
-
+//import QuestionsPage from "@/pages/admin/QuestionsPage";
+import QuestionsPage from "@/pages/admin/Questionspage";
 // checkout
 import CheckoutPage from "@/pages/student/CheckoutPage/PaymentIndex";
 
