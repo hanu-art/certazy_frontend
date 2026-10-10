@@ -11,7 +11,7 @@ export default function CheckoutPage() {
     const navigate       = useNavigate();
     const courseId       = searchParams.get("course");
 
-    const { course, loading, error, method, setMethod, paying, handlePay, inrAmount } = useCheckout(courseId);
+    const { course, loading, error, method, setMethod, paying, scriptLoading, handlePay, paymentAmount, paymentCurrency } = useCheckout(courseId);
 
     if (loading) return <CheckoutSkeleton />;
 
@@ -30,9 +30,25 @@ export default function CheckoutPage() {
         </div>
     );
 
-    const priceLabel = method === "razorpay"
-    ? inrAmount ? `₹${inrAmount}` : `₹...` 
-    : `$${course.price}`;
+    // Format price using backend values
+    const formatPrice = (amount, currency) => {
+        if (amount == null || !currency) {
+            return currency === 'INR' ? '₹...' : '$...';
+        }
+        
+        return new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(amount);
+    };
+    
+    const priceLabel = paymentAmount
+    ? formatPrice(paymentAmount, paymentCurrency)
+    : course?.price
+        ? `$${course.price}` 
+        : "...";
 
     return (
         <div className="min-h-screen bg-slate-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -91,13 +107,13 @@ export default function CheckoutPage() {
                         {/* Pay button */}
                         <button
                             onClick={handlePay}
-                            disabled={paying}
+                            disabled={paying || scriptLoading}
                             className="w-full h-[50px] rounded-xl flex items-center justify-center gap-2 font-extrabold text-[15px] text-white bg-[#3282B8] hover:bg-[#2a6fa0] disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-[0_4px_14px_rgba(50,130,184,0.35)]"
                         >
-                            {paying ? (
+                            {(paying || scriptLoading) ? (
                                 <>
                                     <Loader2 size={18} className="animate-spin" />
-                                    Processing...
+                                    {scriptLoading ? "Loading..." : "Processing..."}
                                 </>
                             ) : (
                                 <>
@@ -109,7 +125,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Right */}
-                    <OrderSummary course={course} method={method} inrAmount={inrAmount} />
+                    <OrderSummary course={course} paymentAmount={paymentAmount} paymentCurrency={paymentCurrency} />
                 </div>
             </div>
         </div>

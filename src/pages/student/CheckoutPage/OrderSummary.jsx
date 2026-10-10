@@ -8,10 +8,26 @@ function fmtDuration(mins) {
     return h > 0 ? `${h}h ${m > 0 ? `${m}m` : ""}`.trim() : `${m}m`;
 }
 
-export default function OrderSummary({ course, method, inrAmount }) {
-    const displayPrice = method === "razorpay"
-    ? inrAmount ? `₹${inrAmount}` : `₹...` 
-    : `$${course.price}`;
+export default function OrderSummary({ course, paymentAmount, paymentCurrency }) {
+    // Format price using backend values
+    const formatPrice = (amount, currency) => {
+        if (amount == null || !currency) {
+            return currency === 'INR' ? '₹...' : '$...';
+        }
+        
+        return new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(amount);
+    };
+    
+    const displayPrice = paymentAmount 
+    ? formatPrice(paymentAmount, paymentCurrency)
+    : course?.price 
+        ? `$${course.price}` 
+        : "—";
     
     const meta = [
         { icon: BarChart2, label: course.level ? course.level.charAt(0).toUpperCase() + course.level.slice(1) : "All levels" },

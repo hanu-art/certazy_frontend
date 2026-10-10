@@ -68,32 +68,43 @@ export default function PaymentsPage_new() {
         }
     }, [currentPage, searchTerm, selectedStatus, selectedMethod, selectedCurrency]);
 
-    // ── Load stats (calculate from payments) ───────────────────────────────────
-    const calculateStats = useCallback(() => {
-        if (payments.length === 0) return;
-
-        const totalRevenue = payments.reduce((sum, p) => {
-            if (p.status === 'success' && p.currency === 'INR') {
-                return sum + parseFloat(p.amount || 0);
-            }
-            return sum;
-        }, 0);
-
-        const successCount = payments.filter(p => p.status === 'success').length;
-        const pendingCount = payments.filter(p => p.status === 'pending').length;
-        const failedCount = payments.filter(p => p.status === 'failed').length;
-
-        setStats({
-            totalRevenue: totalRevenue.toFixed(2),
-            successCount,
-            pendingCount,
-            failedCount,
-            totalCount: payments.length,
-        });
+    // ── Load stats from API
+    const loadStats = useCallback(async () => {
+        try {
+            const { data } = await paymentService.getRevenueStats();
+            const apiStats = data.data;
+            
+            // Calculate payment counts from current payments data
+            const successCount = payments.filter(p => p.status === 'success').length;
+            const pendingCount = payments.filter(p => p.status === 'pending').length;
+            const failedCount = payments.filter(p => p.status === 'failed').length;
+            
+            setStats({
+                total_revenue_usd: apiStats.total_revenue_usd || "0.00",
+                total_sales: apiStats.total_sales || 0,
+                monthly_revenue: apiStats.monthly_revenue || "0.00",
+                successCount,
+                pendingCount,
+                failedCount,
+                totalCount: payments.length,
+            });
+        } catch (err) {
+            console.error("Failed to load revenue stats:", err);
+            // Set default stats to prevent UI break
+            setStats({
+                total_revenue_usd: "0.00",
+                total_sales: 0,
+                monthly_revenue: "0.00",
+                successCount: 0,
+                pendingCount: 0,
+                failedCount: 0,
+                totalCount: 0,
+            });
+        }
     }, [payments]);
 
     useEffect(() => { load(); }, [load]);
-    useEffect(() => { calculateStats(); }, [calculateStats]);
+    useEffect(() => { loadStats(); }, [loadStats]);
 
     // ── Derived values ─────────────────────────────────────────────────────────
     const totalPages = Math.ceil(totalCount / PER_PAGE);
@@ -166,7 +177,8 @@ export default function PaymentsPage_new() {
             {stats && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                        { label: "Total Revenue", value: `₹${stats.totalRevenue}`, icon: DollarSign, bg: "#F0FDF4", color: "#16A34A" },
+                        { label: "Total Revenue", value: `$${stats.total_revenue_usd}`, icon: DollarSign, bg: "#F0FDF4", color: "#16A34A" },
+                        { label: "Total Sales", value: stats.total_sales, icon: CheckCircle, bg: "#EBF4FF", color: "#3282B8" },
                         { label: "Successful", value: stats.successCount, icon: CheckCircle, bg: "#EBF4FF", color: "#3282B8" },
                         { label: "Pending", value: stats.pendingCount, icon: Clock, bg: "#FFFBEB", color: "#F59E0B" },
                         { label: "Failed", value: stats.failedCount, icon: XCircle, bg: "#FEF2F2", color: "#EF4444" },
@@ -259,6 +271,7 @@ export default function PaymentsPage_new() {
                                         <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">Student</th>
                                         <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">Course</th>
                                         <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">Amount</th>
+                                        <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">USD Value</th>
                                         <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">Method</th>
                                         <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">Status</th>
                                         <th className="text-left px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-600">Date</th>
@@ -291,10 +304,20 @@ export default function PaymentsPage_new() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-lg font-bold text-slate-900">
-                                                            {formatAmount(payment.amount, payment.currency)}
+                                                            {formatAmount(payment.paid_amount, payment.currency)}
                                                         </span>
                                                         <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
                                                             {payment.currency}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-lg font-bold text-green-600">
+                                                            ${payment.usd_amount ? parseFloat(payment.usd_amount).toFixed(2) : '0.00'}
+                                                        </span>
+                                                        <span className="text-xs text-slate-500 bg-green-50 px-2 py-1 rounded">
+                                                            USD
                                                         </span>
                                                     </div>
                                                 </td>

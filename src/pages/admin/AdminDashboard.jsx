@@ -310,13 +310,18 @@ export default function AdminDashboard() {
                 // Load dashboard stats
                 const statsResponse = await adminService.getDashboardStats();
                 const dashboardStats = statsResponse.data?.data || {};
+                
+                // Load revenue data
+                const revenueResponse = await paymentService.getRevenueStats();
+                const revenueData = revenueResponse.data?.data || {};
+                
                 setStats({
                     totalUsers: dashboardStats.totalUsers || 0,
                     activeUsers: dashboardStats.activeUsers || 0,
                     totalCourses: dashboardStats.totalCourses || 0,
                     publishedCourses: dashboardStats.publishedCourses || 0,
-                    totalRevenue: dashboardStats.totalRevenue || 0,
-                    thisMonthRevenue: dashboardStats.thisMonthRevenue || 0,
+                    totalRevenue: Number(revenueData.total_revenue_usd || 0),
+                    thisMonthRevenue: Number(revenueData.monthly_revenue?.[revenueData.monthly_revenue?.length - 1]?.revenue || 0),
                     pendingReviews: dashboardStats.pendingReviews || 0,
                     pendingPayments: dashboardStats.pendingPayments || 0,
                     userGrowth: dashboardStats.userGrowth || null,
@@ -325,9 +330,8 @@ export default function AdminDashboard() {
                     courseGrowth: dashboardStats.courseGrowth || null,
                 });
 
-                // Load revenue data
-                const revenueResponse = await adminService.getRevenueOverview();
-                setRevenueData(revenueResponse.data?.data?.monthly || []);
+                // Load revenue data for chart
+                setRevenueData(revenueData.monthly_revenue || []);
 
                 // Load recent payments
                 const paymentsResponse = await paymentService.getRecentPayments(5);
@@ -456,7 +460,10 @@ export default function AdminDashboard() {
                 />
                 <AnalyticsCard
                     title="Total Revenue"
-                    value={`$${(stats.totalRevenue / 1000).toFixed(1)}k`}
+                    value={new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD'
+                    }).format(stats.totalRevenue)}
                     change={stats.revenueGrowth || null}
                     icon={DollarSign}
                     color="purple"

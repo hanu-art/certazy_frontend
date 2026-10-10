@@ -27,9 +27,8 @@ const paymentService = {
     paypalCreateOrder: (data) => api.post("/v1/payments/paypal/create-order", data),
     paypalCapture:     (data) => api.post("/v1/payments/paypal/capture",       data),
 
-    // Admin endpoint as specified
+    // Admin endpoints
     getAllPayments: (params = {}) => {
-        // Support ?status=success, ?method=razorpay filters
         const queryParams = new URLSearchParams();
         if (params.status) queryParams.append('status', params.status);
         if (params.method) queryParams.append('method', params.method);
@@ -45,6 +44,9 @@ const paymentService = {
     getRecentPayments: (limit = 10) => {
         return api.get(`/v1/payments/admin/all?limit=${limit}`);
     },
+
+    // Revenue stats
+    getRevenueStats: () => api.get("/v1/payments/admin/revenue"),
 };
 
 export default paymentService;
