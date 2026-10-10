@@ -33,7 +33,8 @@ import UsersPage          from "@/pages/admin/UsersPage";
 import AdminCoursesPage   from "@/pages/admin/CoursesPage";
 import CategoriesPage     from "@/pages/admin/CategoriesPage";
 import ReviewsManagementPage from "@/pages/admin/ReviewsManagementPage";
-import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
+//import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
+import CurriculumPage from "@/pages/admin/Curriculumpage";
 import EnrollmentsPage    from "@/pages/admin/EnrollmentsPage";
 import ContactPage        from "@/pages/admin/ContactPage";
 
