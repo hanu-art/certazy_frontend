@@ -1,5 +1,4 @@
-//import HeroSection from "./Herosection";
-import HeroSection from "./HeroSection";
+import HeroSection from "./Herosection";
 import LearningSection from "./LearningSection";
 import HowItWorks from "./HowItWorks";
 import Testimonials from "./Testimonials";

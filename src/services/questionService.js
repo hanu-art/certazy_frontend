@@ -17,13 +17,13 @@ import api from "./api";
 
 const questionService = {
     // Public
-    getByTestId: (testId) => api.get(`/v1/questions/test/${testId}`),
-    getById: (id) => api.get(`/v1/questions/${id}`),
+    getByTestId: (testId) => api.get(`/questions/test/${testId}`),
+    getById: (id) => api.get(`/questions/${id}`),
 
     // Admin only
-    create: (data) => api.post("/v1/questions/create", data),
-    update: (id, data) => api.put(`/v1/questions/update/${id}`, data),
-    delete: (id) => api.delete(`/v1/questions/delete/${id}`),
+    create: (data) => api.post("/questions/create", data),
+    update: (id, data) => api.put(`/questions/update/${id}`, data),
+    delete: (id) => api.delete(`/questions/delete/${id}`),
 };
 
 export default questionService;

@@ -33,8 +33,7 @@ import UsersPage          from "@/pages/admin/UsersPage";
 import AdminCoursesPage   from "@/pages/admin/CoursesPage";
 import CategoriesPage     from "@/pages/admin/CategoriesPage";
 import ReviewsManagementPage from "@/pages/admin/ReviewsManagementPage";
-//import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
-import CurriculumPage from "@/pages/admin/Curriculumpage";
+import CurriculumPage    from "@/pages/admin/curriculumpage.jsx";
 import EnrollmentsPage    from "@/pages/admin/EnrollmentsPage";
 import ContactPage        from "@/pages/admin/ContactPage";
 
@@ -48,8 +47,8 @@ import AdminLayout        from "@/components/layout/AdminLayout";
 import DiscountsPage     from "@/pages/admin/DiscountsPage";
 
 import TestsPage     from "@/pages/admin/TestsPage";
-//import QuestionsPage from "@/pages/admin/QuestionsPage";
-import QuestionsPage from "@/pages/admin/Questionspage";
+import QuestionsPage from "@/pages/admin/QuestionsPage";
+
 // checkout
 import CheckoutPage from "@/pages/student/CheckoutPage/PaymentIndex";
 

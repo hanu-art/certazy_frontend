@@ -3,307 +3,142 @@ import api from "./api";
 /**
  * adminService.js
  *
- * IMPORTANT: Backend only has limited admin routes
- * Existing admin routes:
- *   GET  /api/v1/admin/permissions/:userId
- *   POST /api/v1/admin/permissions
- *   PUT  /api/v1/admin/permissions/:userId
- *   DELETE /api/v1/admin/permissions/:userId
- *
- * All other admin functionality needs to use existing public/student endpoints
- * Most endpoints are student-protected and will return 403 for admins
- *
- * WORKING ENDPOINTS:
- *   GET  /api/v1/auth/users/all         → all users with filters
- *   GET  /api/v1/auth/users/:id         → single user details
- *   PUT  /api/v1/auth/users/:id/status  → activate/deactivate user
- *   GET  /api/v1/courses              → all courses (filters + pagination)
- *   GET  /api/v1/courses/:slug        → single course
- *   
- * STUDENT-ONLY ENDPOINTS (403 for admins):
- *   GET  /api/v1/payments/history     → payment history (student only)
- *   GET  /api/v1/enrollments          → enrolled courses (student only)
- *   GET  /api/v1/reviews/*           → reviews (student/limited access)
+ * Backend base URL is set to /api/v1 via VITE_API_BASE_URL.
+ * All endpoint paths here are relative to baseURL (no /v1 prefix).
  */
 
 const adminService = {
-    // Dashboard - using existing endpoints
+    // Dashboard & Revenue Stats
     getDashboardStats: async () => {
         try {
-            // Get users count
-            const usersResponse = await api.get("/v1/auth/users/all");
-            const users = usersResponse.data?.data?.users || [];
-            
-            // Get courses count  
-            const coursesResponse = await api.get("/v1/courses");
-            const courses = coursesResponse.data?.data?.courses || [];
-            
-            return {
-                data: {
-                    totalUsers: users.length,
-                    activeUsers: users.filter(u => u.status === 'active').length,
-                    totalCourses: courses.length,
-                    publishedCourses: courses.filter(c => c.status === 'published').length,
-                    totalRevenue: 0, // TODO: Calculate from payments when available
-                    thisMonthRevenue: 0, // TODO: Calculate from payments when available
-                    pendingReviews: 0, // TODO: Get from reviews when available
-                    pendingPayments: 0, // TODO: Get from payments when available
-                }
-            };
+            return await api.get("/admin/dashboard");
         } catch (error) {
-            return {
-                data: {
-                    totalUsers: 0,
-                    activeUsers: 0,
-                    totalCourses: 0,
-                    publishedCourses: 0,
-                    totalRevenue: 0,
-                    thisMonthRevenue: 0,
-                    pendingReviews: 0,
-                    pendingPayments: 0,
+            try {
+                return await api.get("/admin/stats");
+            } catch (fallbackError) {
+                console.error("Dashboard stats endpoints failed, attempting fallback:", fallbackError);
+                try {
+                    const [usersResponse, coursesResponse] = await Promise.all([
+                        api.get("/auth/users/all"),
+                        api.get("/courses")
+                    ]);
+                    const users = usersResponse.data?.data?.users || usersResponse.data?.data || [];
+                    const courses = coursesResponse.data?.data?.courses || coursesResponse.data?.data || [];
+                    return {
+                        data: {
+                            totalUsers: users.length,
+                            activeUsers: users.filter(u => u.status === 'active' || u.is_active === 1).length,
+                            totalCourses: courses.length,
+                            publishedCourses: courses.filter(c => c.status === 'published').length,
+                            totalRevenue: 0,
+                            thisMonthRevenue: 0,
+                            pendingReviews: 0,
+                            pendingPayments: 0,
+                        }
+                    };
+                } catch {
+                    return {
+                        data: {
+                            totalUsers: 0,
+                            activeUsers: 0,
+                            totalCourses: 0,
+                            publishedCourses: 0,
+                            totalRevenue: 0,
+                            thisMonthRevenue: 0,
+                            pendingReviews: 0,
+                            pendingPayments: 0,
+                        }
+                    };
                 }
-            };
+            }
         }
     },
     
     getRevenueOverview: async () => {
-        return { data: { monthly: [] } }; // TODO: Implement when payment data available
+        return api.get("/payments/admin/revenue");
     },
 
-    // Users - using existing auth endpoints
-    getUsers: (params = {}) => api.get("/v1/auth/users/all", { params }),
-    getUserById: (id) => api.get(`/v1/auth/users/${id}`),
-    updateUserStatus: (id, data) => api.put(`/v1/auth/users/${id}/status`, data),
+    // Users
+    getUsers: (params = {}) => api.get("/auth/users/all", { params }),
+    getUserById: (id) => api.get(`/auth/users/${id}`),
+    updateUserStatus: (id, data) => api.put(`/auth/users/${id}/status`, data),
     
     // Sub-Admin Management
-    createSubAdmin: (data) => api.post("/v1/admin/sub-admins/create", data),
+    createSubAdmin: (data) => api.post("/admin/sub-admins/create", data),
     
     // Permissions Management
-    getPermissions: (userId) => api.get(`/v1/admin/permissions/${userId}`),
-    updatePermissions: (userId, data) => api.put(`/v1/admin/permissions/${userId}`, data),
-    deletePermissions: (userId) => api.delete(`/v1/admin/permissions/${userId}`),
+    getPermissions: (userId) => api.get(`/admin/permissions/${userId}`),
+    updatePermissions: (userId, data) => api.put(`/admin/permissions/${userId}`, data),
+    deletePermissions: (userId) => api.delete(`/admin/permissions/${userId}`),
     
-    // Courses - using existing course endpoints
-    getCourses: (params = {}) => api.get("/v1/courses", { params }),
-    getCourseById: (id) => api.get(`/v1/courses/${id}`),
+    // Courses
+    getCourses: (params = {}) => api.get("/courses", { params }),
+    getCourseById: (id) => api.get(`/courses/${id}`),
     toggleCourseStatus: async (id) => {
-        // TODO: Implement when course update endpoint available
         console.log("Toggle course status for:", id);
     },
     toggleCourseFeatured: async (id) => {
-        // TODO: Implement when course update endpoint available
         console.log("Toggle featured for:", id);
     },
     
-    // Categories - using existing endpoints when available
-    getCategories: async () => {
-        try {
-            // Extract categories from courses
-            const coursesResponse = await api.get("/v1/courses");
-            const courses = coursesResponse.data?.data?.courses || [];
-            const categories = [...new Set(courses.map(c => c.category).filter(Boolean))];
-            
-            return {
-                data: {
-                    categories: categories.map((cat, index) => ({
-                        id: index + 1,
-                        name: cat,
-                        description: `${cat} category`,
-                        status: 'active'
-                    }))
-                }
-            };
-        } catch (error) {
-            return { data: { categories: [] } };
-        }
-    },
+    // Categories
+    getCategories: () => api.get("/categories"),
+    createCategory: (data) => api.post("/categories/create", data),
+    updateCategory: (id, data) => api.put(`/categories/update/${id}`, data),
+    deleteCategory: (id) => api.delete(`/categories/delete/${id}`),
     
-    createCategory: async (data) => {
-        // TODO: Implement when category endpoint available
-        console.log("Create category:", data);
-        return { data: { category: data } };
-    },
-    
-    updateCategory: async (id, data) => {
-        // TODO: Implement when category endpoint available  
-        console.log("Update category:", id, data);
-        return { data: { category: data } };
-    },
-    
-    deleteCategory: async (id) => {
-        // TODO: Implement when category endpoint available
-        console.log("Delete category:", id);
-        return { success: true };
-    },
-    
-    // Payments - using existing payment endpoints
-    getPayments: async (params = {}) => {
-        try {
-            const response = await api.get("/v1/payments/history", { params });
-            return {
-                data: {
-                    payments: response.data?.data?.payments?.map(payment => ({
-                        ...payment,
-                        user: payment.user || { name: 'Unknown User', email: 'unknown@example.com' },
-                        course: payment.course || { title: 'Unknown Course' },
-                        userName: payment.user?.name || 'Unknown User',
-                        userEmail: payment.user?.email || 'unknown@example.com', 
-                        courseName: payment.course?.title || 'Unknown Course',
-                    })) || []
-                }
-            };
-        } catch (error) {
-            return { data: { payments: [] } };
-        }
-    },
-    
-    getRecentPayments: async (limit = 10) => {
-        const response = await api.get("/v1/payments/history", { params: { limit } });
-        return {
-            data: {
-                payments: response.data?.data?.payments?.slice(0, limit).map(payment => ({
-                    ...payment,
-                    user: payment.user || { name: 'Unknown User', email: 'unknown@example.com' },
-                    course: payment.course || { title: 'Unknown Course' },
-                    userName: payment.user?.name || 'Unknown User',
-                    userEmail: payment.user?.email || 'unknown@example.com',
-                    courseName: payment.course?.title || 'Unknown Course',
-                })) || []
-            }
-        };
-    },
-    
+    // Payments
+    getPayments: (params = {}) => api.get("/payments/admin/all", { params }),
+    getRecentPayments: (limit = 10) => api.get(`/payments/admin/all?limit=${limit}`),
     updatePaymentStatus: async (id, status) => {
-        // TODO: Implement when payment update endpoint available
         console.log("Update payment status:", id, status);
         return { success: true };
     },
     
-    // Reviews - using existing endpoints when available
-    getPendingReviews: async (limit = 10) => {
-        try {
-            // TODO: Implement when review endpoints available
-            return { data: { reviews: [] } };
-        } catch (error) {
-            return { data: { reviews: [] } };
-        }
-    },
+    // Reviews
+    getPendingReviews: (limit = 10) => api.get(`/reviews/admin/pending?limit=${limit}`),
+    getAllReviews: (params = {}) => api.get("/reviews/admin/all", { params }),
+    approveReview: (id) => api.put(`/reviews/${id}/approval`, { is_approved: 1 }),
+    rejectReview: (id) => api.put(`/reviews/${id}/approval`, { is_approved: 0 }),
     
-    getAllReviews: (params = {}) => {
-        // TODO: Implement when review endpoints available
-        return Promise.resolve({ data: { reviews: [] } });
-    },
-    
-    approveReview: async (id) => {
-        // TODO: Implement when review endpoints available
-        console.log("Approve review:", id);
-        return { success: true };
-    },
-    
-    rejectReview: async (id) => {
-        // TODO: Implement when review endpoints available
-        console.log("Reject review:", id);
-        return { success: true };
-    },
-    
-    // Enrollments - using existing endpoints
-    getEnrollments: (params = {}) => api.get("/v1/enrollments", { params }),
+    // Enrollments
+    getEnrollments: (params = {}) => api.get("/enrollments/admin/all", { params }),
     updateEnrollment: (id, data) => {
-        // TODO: Implement when enrollment update endpoint available
         console.log("Update enrollment:", id, data);
         return Promise.resolve({ success: true });
     },
     
-    // Discounts - using existing endpoints when available
-    getDiscounts: () => {
-        // TODO: Implement when discount endpoints available
-        return Promise.resolve({ data: { discounts: [] } });
-    },
+    // Discounts
+    getDiscounts: () => api.get("/discounts"),
+    createDiscount: (data) => api.post("/discounts", data),
+    updateDiscount: (id, data) => api.put(`/discounts/${id}`, data),
+    deleteDiscount: (id) => api.delete(`/discounts/${id}`),
     
-    createDiscount: (data) => {
-        // TODO: Implement when discount endpoint available
-        console.log("Create discount:", data);
-        return Promise.resolve({ data: { discount: data } });
-    },
+    // Certificates
+    getCertificates: () => api.get("/certificates/admin/all"),
+    issueCertificate: (data) => api.post("/certificates/issue", data),
+    revokeCertificate: (id) => api.put(`/certificates/${id}/revoke`),
     
-    updateDiscount: (id, data) => {
-        // TODO: Implement when discount endpoint available
-        console.log("Update discount:", id, data);
-        return Promise.resolve({ success: true });
-    },
-    
-    deleteDiscount: (id) => {
-        // TODO: Implement when discount endpoint available
-        console.log("Delete discount:", id);
-        return Promise.resolve({ success: true });
-    },
-    
-    // Certificates - using existing endpoints when available
-    getCertificates: () => {
-        // TODO: Implement when certificate endpoints available
-        return Promise.resolve({ data: { certificates: [] } });
-    },
-    
-    issueCertificate: (data) => {
-        // TODO: Implement when certificate endpoint available
-        console.log("Issue certificate:", data);
-        return Promise.resolve({ data: { certificate: data } });
-    },
-    
-    revokeCertificate: (id) => {
-        // TODO: Implement when certificate endpoint available
-        console.log("Revoke certificate:", id);
-        return Promise.resolve({ success: true });
-    },
-    
-    // Contact Messages - using existing endpoints
-    getContactMessages: (params = {}) => {
-        // TODO: Implement when contact endpoints available
-        return Promise.resolve({ data: { messages: [] } });
-    },
-    
-    markMessageAsRead: (id) => {
-        // TODO: Implement when contact endpoints available
-        console.log("Mark message as read:", id);
-        return Promise.resolve({ success: true });
-    },
-    
+    // Contact Messages
+    getContactMessages: (params = {}) => api.get("/contact", { params }),
+    markMessageAsRead: (id) => api.put(`/contact/${id}/status`, { status: "read" }),
     replyToMessage: (id, data) => {
-        // TODO: Implement when contact endpoints available
         console.log("Reply to message:", id, data);
         return Promise.resolve({ success: true });
     },
     
-    // Settings - using existing endpoints when available
-    getSettings: () => {
-        // TODO: Implement when settings endpoints available
-        return Promise.resolve({ data: { settings: {} } });
-    },
-    
+    // Settings
+    getSettings: () => Promise.resolve({ data: { settings: {} } }),
     updateSettings: (data) => {
-        // TODO: Implement when settings endpoints available
         console.log("Update settings:", data);
         return Promise.resolve({ success: true });
     },
     
     // Reports
-    getRevenueReport: (params = {}) => {
-        // TODO: Implement when report endpoints available
-        return Promise.resolve({ data: { report: [] } });
-    },
-    
-    getUserReport: (params = {}) => {
-        // TODO: Implement when report endpoints available
-        return Promise.resolve({ data: { report: [] } });
-    },
-    
-    getCourseReport: (params = {}) => {
-        // TODO: Implement when report endpoints available
-        return Promise.resolve({ data: { report: [] } });
-    },
-    
+    getRevenueReport: (params = {}) => Promise.resolve({ data: { report: [] } }),
+    getUserReport: (params = {}) => Promise.resolve({ data: { report: [] } }),
+    getCourseReport: (params = {}) => Promise.resolve({ data: { report: [] } }),
     exportData: (type, params = {}) => {
-        // TODO: Implement when export endpoints available
         console.log("Export data:", type, params);
         return Promise.resolve(new Blob());
     },

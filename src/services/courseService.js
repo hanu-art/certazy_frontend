@@ -25,16 +25,16 @@ import api from "./api";
 
 const courseService = {
     // Public
-    getAll: (params = {}) => api.get("/v1/courses", { params }),
+    getAll: (params = {}) => api.get("/courses", { params }),
     // params example:
     // { search: "AWS", category: 12, level: "beginner", page: 1, limit: 12 }
 
-    getBySlug: (slug) => api.get(`/v1/courses/${slug}`),
+    getBySlug: (slug) => api.get(`/courses/${slug}`),
 
     // Admin only
-    create: (data) => api.post("/v1/courses/create", data),
-    update: (id, data) => api.put(`/v1/courses/update/${id}`, data),
-    delete: (id) => api.delete(`/v1/courses/delete/${id}`),
+    create: (data) => api.post("/courses/create", data),
+    update: (id, data) => api.put(`/courses/update/${id}`, data),
+    delete: (id) => api.delete(`/courses/delete/${id}`),
 };
 
 export default courseService;

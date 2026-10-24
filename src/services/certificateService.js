@@ -18,16 +18,17 @@ import api from "./api";
  */
 
 const certificateService = {
-    // GET /v1/certificates — student ke saare certificates
-    getMyCertificates: () => api.get("/v1/certificates"),
-    
+    // GET /certificates — student ke saare certificates
+    getMyCertificates: () => api.get("/certificates"),
+
     // Public
-    download: (id) => api.get(`/v1/certificates/${id}`, { responseType: 'blob' }),
+    download: (id) => api.get(`/certificates/${id}`, { responseType: 'blob' }),
 
     // Admin only
-    issue: (data) => api.post("/v1/certificates/issue", data),
-    getAllAdmin: () => api.get("/v1/certificates/admin/all"),
-    revoke: (id) => api.put(`/v1/certificates/${id}/revoke`),
+    issue: (data) => api.post("/certificates/issue", data),
+    getAllAdmin: () => api.get("/certificates/admin/all"),
+    revoke: (id) => api.put(`/certificates/${id}/revoke`),
 };
 
 export default certificateService;
+

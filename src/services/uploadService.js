@@ -5,7 +5,7 @@ const uploadService = {
     // Get pre-signed URL for direct upload
     getPresignedUrl: async (data) => {
         try {
-            const response = await api.post('/v1/upload/presigned-url', data);
+            const response = await api.post('/upload/presigned-url', data);
             return response.data;
         } catch (error) {
             console.error('Failed to get pre-signed URL:', error);
