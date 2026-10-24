@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { ChevronDown, Loader2, BookOpen, LayoutGrid } from "lucide-react";
+import { logoutUser } from "@/features/auth/authSlice";
 import categoryService from "@/services/categoryService";
 import Searchbar from "./Searchbar";
 import { MORE_ITEMS, STUDENT_MENU_ITEMS } from "./navbar.data";
@@ -15,9 +17,20 @@ import { cn } from "@/lib/utils";
  *   onClose    → close menu callback
  */
 export default function MobileMenu({ isLoggedIn, user, onClose }) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [catOpen, setCatOpen] = useState(false);
+
+    const handleLogout = async () => {
+        onClose();
+        try {
+            await dispatch(logoutUser());
+        } finally {
+            window.location.href = "/";
+        }
+    };
 
     // ── Fetch categories ─────────────────────────────────────
     useEffect(() => {
@@ -179,6 +192,17 @@ export default function MobileMenu({ isLoggedIn, user, onClose }) {
                             {STUDENT_MENU_ITEMS.map((item, i) =>
                                 item.divider ? (
                                     <div key={i} className="h-px bg-border !my-2" />
+                                ) : item.danger ? (
+                                    <button
+                                        key={i}
+                                        onClick={handleLogout}
+                                        className={cn(
+                                            "w-full text-left block px-2 py-2.5 rounded text-[14px] font-medium",
+                                            "transition-colors duration-150 text-red-500 hover:bg-red-50"
+                                        )}
+                                    >
+                                        {item.label}
+                                    </button>
                                 ) : (
                                     <Link
                                         key={i}
@@ -186,10 +210,7 @@ export default function MobileMenu({ isLoggedIn, user, onClose }) {
                                         onClick={onClose}
                                         className={cn(
                                             "block px-2 py-2.5 rounded text-[14px] font-medium",
-                                            "transition-colors duration-150",
-                                            item.danger
-                                                ? "text-red-500 hover:bg-red-50"
-                                                : "text-text-secondary hover:bg-primary-light hover:text-primary"
+                                            "transition-colors duration-150 text-text-secondary hover:bg-primary-light hover:text-primary"
                                         )}
                                     >
                                         {item.label}

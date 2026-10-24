@@ -10,11 +10,8 @@ export default function App() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // Only fetch user data if not on public home page
-        if (window.location.pathname !== '/') {
-            dispatch(fetchMe()).unwrap().catch(() => {});
-        }
-    }, []);
+        dispatch(fetchMe()).unwrap().catch(() => {});
+    }, [dispatch]);
 
     // Check if current path is admin
     const isAdminPage = window.location.pathname.startsWith('/admin');

@@ -20,16 +20,15 @@ import api from "./api";
 
 const reviewService = {
     // Public
-    getCourseReviews: (courseId, params = {}) => api.get(`/v1/reviews/${courseId}`, { params }),
-    createReview: (data) => api.post("/v1/reviews/create", data),
+    getCourseReviews: (courseId, params = {}) => api.get(`/reviews/${courseId}`, { params }),
+    createReview: (data) => api.post("/reviews/create", data),
 
-    // Admin only (fallbacks - will return 403, need backend implementation)
+    // Admin
     getAllReviews: async (params = {}) => {
         try {
-            return await api.get("/v1/reviews/admin/all", { params });
+            return await api.get("/reviews/admin/all", { params });
         } catch (error) {
             if (error.response?.status === 403 || error.response?.status === 404) {
-                // Return mock data when endpoint is not available for admins
                 return { 
                     data: { 
                         reviews: [
@@ -45,15 +44,10 @@ const reviewService = {
     
     getPendingReviews: async (limit = 10) => {
         try {
-            console.log("Trying to get pending reviews...");
-            const response = await api.get(`/v1/reviews/admin/pending?limit=${limit}`);
-            console.log("Reviews response:", response);
+            const response = await api.get(`/reviews/admin/pending?limit=${limit}`);
             return response;
         } catch (error) {
-            console.log("Review service error:", error.response?.status);
             if (error.response?.status === 403 || error.response?.status === 404) {
-                console.log("Returning mock review data for admin...");
-                // Return mock data when endpoint is not available for admins
                 return { 
                     data: { 
                         reviews: [
@@ -69,10 +63,9 @@ const reviewService = {
     
     approveReview: async (id) => {
         try {
-            return await api.put(`/v1/reviews/${id}/approve`);
+            return await api.put(`/reviews/${id}/approval`, { is_approved: 1 });
         } catch (error) {
             if (error.response?.status === 403 || error.response?.status === 404) {
-                console.log(`Review approval not available for admins (ID: ${id})`);
                 return { data: { success: true } };
             }
             throw error;
@@ -81,10 +74,9 @@ const reviewService = {
     
     rejectReview: async (id) => {
         try {
-            return await api.put(`/v1/reviews/${id}/reject`);
+            return await api.put(`/reviews/${id}/approval`, { is_approved: 0 });
         } catch (error) {
             if (error.response?.status === 403 || error.response?.status === 404) {
-                console.log(`Review rejection not available for admins (ID: ${id})`);
                 return { data: { success: true } };
             }
             throw error;

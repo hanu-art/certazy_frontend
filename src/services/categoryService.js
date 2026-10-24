@@ -19,10 +19,9 @@ const categoryService = {
   // GET all categories
   getAll: async () => {
     try {
-      const response = await api.get("/v1/categories");
+      const response = await api.get("/categories");
       return response;
     } catch (error) {
-    
       throw error;
     }
   },
@@ -30,9 +29,8 @@ const categoryService = {
   // GET category by slug
   getBySlug: async (slug) => {
     try {
-      return await api.get(`/v1/categories/slug/${slug}`);
+      return await api.get(`/categories/slug/${slug}`);
     } catch (error) {
-  
       throw error;
     }
   },
@@ -40,9 +38,8 @@ const categoryService = {
   // GET category by ID
   getById: async (id) => {
     try {
-      return await api.get(`/v1/categories/${id}`);
+      return await api.get(`/categories/${id}`);
     } catch (error) {
-     
       throw error;
     }
   },
@@ -55,15 +52,12 @@ const categoryService = {
         description: data.description || "",
         sort_order: data.sort_order || 1,
         is_active: data.status === "active" ? 1 : 0,
-         parent_id: data.parent_id || undefined,
+        parent_id: data.parent_id || undefined,
       };
 
-      
-      const response = await api.post("/v1/categories/create", payload);
-   
+      const response = await api.post("/categories/create", payload);
       return response;
     } catch (error) {
-   
       throw error;
     }
   },
@@ -77,13 +71,9 @@ const categoryService = {
         sort_order: data.sort_order || 1,
       };
 
-      const response = await api.put(`/v1/categories/update/${id}`, payload);
-    
-  
-      
+      const response = await api.put(`/categories/update/${id}`, payload);
       return response;
     } catch (error) {
-    
       throw error;
     }
   },
@@ -91,12 +81,9 @@ const categoryService = {
   // DELETE category
   delete: async (id) => {
     try {
-     
-      const response = await api.delete(`/v1/categories/delete/${id}`);
-    
+      const response = await api.delete(`/categories/delete/${id}`);
       return response;
     } catch (error) {
-    
       throw error;
     }
   },

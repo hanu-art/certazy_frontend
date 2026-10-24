@@ -307,59 +307,85 @@ export default function AdminDashboard() {
                 setLoading(true);
                 setError(null);
 
-                // Load dashboard stats
-                const statsResponse = await adminService.getDashboardStats();
-                const dashboardStats = statsResponse.data?.data || {};
-                
-                // Load revenue data
-                const revenueResponse = await paymentService.getRevenueStats();
-                const revenueData = revenueResponse.data?.data || {};
-                
+                // 1. Load dashboard stats
+                let dashboardStats = {};
+                let statsErr = null;
+                try {
+                    const statsResponse = await adminService.getDashboardStats();
+                    dashboardStats = statsResponse.data?.data || statsResponse.data || {};
+                } catch (err) {
+                    statsErr = err;
+                    console.error("Dashboard stats error:", err);
+                }
+
+                // 2. Load revenue data
+                let revenueData = {};
+                try {
+                    const revenueResponse = await paymentService.getRevenueStats();
+                    revenueData = revenueResponse.data?.data || revenueResponse.data || {};
+                } catch (revErr) {
+                    console.warn("Revenue stats not available:", revErr);
+                }
+
+                // If primary stats endpoint returned 404 and no data was resolved, show friendly message
+                if (statsErr && statsErr.response?.status === 404 && Object.keys(dashboardStats).length === 0) {
+                    setError("Dashboard API endpoints not available. Please ensure backend is properly configured.");
+                }
+
+                const monthlyRev = revenueData.monthly_revenue || dashboardStats.monthly_revenue || [];
+                const lastMonthEntry = monthlyRev.length ? monthlyRev[monthlyRev.length - 1] : null;
+
                 setStats({
-                    totalUsers: dashboardStats.totalUsers || 0,
-                    activeUsers: dashboardStats.activeUsers || 0,
-                    totalCourses: dashboardStats.totalCourses || 0,
-                    publishedCourses: dashboardStats.publishedCourses || 0,
-                    totalRevenue: Number(revenueData.total_revenue_usd || 0),
-                    thisMonthRevenue: Number(revenueData.monthly_revenue?.[revenueData.monthly_revenue?.length - 1]?.revenue || 0),
-                    pendingReviews: dashboardStats.pendingReviews || 0,
-                    pendingPayments: dashboardStats.pendingPayments || 0,
-                    userGrowth: dashboardStats.userGrowth || null,
-                    activeUserGrowth: dashboardStats.activeUserGrowth || null,
-                    revenueGrowth: dashboardStats.revenueGrowth || null,
-                    courseGrowth: dashboardStats.courseGrowth || null,
+                    totalUsers: dashboardStats.totalUsers ?? dashboardStats.total_users ?? 0,
+                    activeUsers: dashboardStats.activeUsers ?? dashboardStats.active_users ?? 0,
+                    totalCourses: dashboardStats.totalCourses ?? dashboardStats.total_courses ?? 0,
+                    publishedCourses: dashboardStats.publishedCourses ?? dashboardStats.published_courses ?? 0,
+                    totalRevenue: Number(revenueData.total_revenue_usd ?? revenueData.total_revenue ?? dashboardStats.totalRevenue ?? dashboardStats.total_revenue ?? 0),
+                    thisMonthRevenue: Number(lastMonthEntry?.revenue ?? dashboardStats.thisMonthRevenue ?? dashboardStats.this_month_revenue ?? 0),
+                    pendingReviews: dashboardStats.pendingReviews ?? dashboardStats.pending_reviews ?? 0,
+                    pendingPayments: dashboardStats.pendingPayments ?? dashboardStats.pending_payments ?? 0,
+                    userGrowth: dashboardStats.userGrowth ?? dashboardStats.user_growth ?? null,
+                    activeUserGrowth: dashboardStats.activeUserGrowth ?? dashboardStats.active_user_growth ?? null,
+                    revenueGrowth: dashboardStats.revenueGrowth ?? dashboardStats.revenue_growth ?? null,
+                    courseGrowth: dashboardStats.courseGrowth ?? dashboardStats.course_growth ?? null,
                 });
 
                 // Load revenue data for chart
-                setRevenueData(revenueData.monthly_revenue || []);
+                setRevenueData(monthlyRev);
 
-                // Load recent payments
-                const paymentsResponse = await paymentService.getRecentPayments(5);
-                const payments = paymentsResponse.data?.data || [];
-                setRecentPayments(payments.map(payment => ({
-                    id: payment.id,
-                    user: payment.student_name || 'Unknown User',
-                    course: payment.course_title || 'Unknown Course',
-                    amount: payment.amount || 0,
-                    status: payment.status || 'unknown',
-                    date: payment.created_at ? new Date(payment.created_at).toLocaleDateString() : 'Invalid Date',
-                })));
+                // 3. Load recent payments
+                try {
+                    const paymentsResponse = await paymentService.getRecentPayments(5);
+                    const rawPayments = paymentsResponse.data?.data?.payments || paymentsResponse.data?.data || paymentsResponse.data || [];
+                    const payments = Array.isArray(rawPayments) ? rawPayments : [];
+                    setRecentPayments(payments.map(payment => ({
+                        id: payment.id,
+                        user: payment.student_name || payment.user?.name || payment.userName || 'Unknown User',
+                        course: payment.course_title || payment.course?.title || payment.courseName || 'Unknown Course',
+                        amount: payment.amount || 0,
+                        status: payment.status || 'unknown',
+                        date: payment.created_at ? new Date(payment.created_at).toLocaleDateString() : 'Invalid Date',
+                    })));
+                } catch (payErr) {
+                    console.warn("Recent payments error:", payErr);
+                    setRecentPayments([]);
+                }
 
-                // Load pending reviews - using real data from contact service as reviews might not be implemented
+                // 4. Load pending reviews
                 try {
                     const reviewsResponse = await reviewService.getPendingReviews(5);
-                    const reviews = reviewsResponse.data?.data || [];
+                    const rawReviews = reviewsResponse.data?.data?.reviews || reviewsResponse.data?.data || reviewsResponse.data || [];
+                    const reviews = Array.isArray(rawReviews) ? rawReviews : [];
                     setPendingReviews(reviews.map(review => ({
                         id: review.id,
-                        user: review.user_name || 'Unknown User',
-                        course: review.course_title || 'Unknown Course',
+                        user: review.user_name || review.student_name || review.user?.name || 'Unknown User',
+                        course: review.course_title || review.course?.title || 'Unknown Course',
                         rating: review.rating || 0,
                         comment: review.comment || '',
                         date: review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Invalid Date',
                     })));
                 } catch (reviewError) {
-                    console.log('Review service not available, using mock data');
-                    // Fallback to minimal mock data
+                    console.warn("Pending reviews error:", reviewError);
                     setPendingReviews([]);
                 }
 
@@ -370,25 +396,6 @@ export default function AdminDashboard() {
                 } else {
                     setError("Failed to load dashboard data");
                 }
-                
-                // Set default values on error
-                setStats({
-                    totalUsers: 0,
-                    activeUsers: 0,
-                    totalCourses: 0,
-                    publishedCourses: 0,
-                    totalRevenue: 0,
-                    thisMonthRevenue: 0,
-                    pendingReviews: 0,
-                    pendingPayments: 0,
-                    userGrowth: null,
-                    activeUserGrowth: null,
-                    revenueGrowth: null,
-                    courseGrowth: null,
-                });
-                setRevenueData([]);
-                setRecentPayments([]);
-                setPendingReviews([]);
             } finally {
                 setLoading(false);
             }

@@ -17,13 +17,13 @@ import api from "./api";
 
 const optionService = {
     // Public
-    getByQuestionId: (questionId) => api.get(`/v1/options/question/${questionId}`),
+    getByQuestionId: (questionId) => api.get(`/options/question/${questionId}`),
 
     // Admin only
-    create: (data) => api.post("/v1/options/create", data),
-    bulkCreate: (data) => api.post("/v1/options/bulk/create", data),
-    update: (id, data) => api.put(`/v1/options/update/${id}`, data),
-    delete: (id) => api.delete(`/v1/options/delete/${id}`),
+    create: (data) => api.post("/options/create", data),
+    bulkCreate: (data) => api.post("/options/bulk/create", data),
+    update: (id, data) => api.put(`/options/update/${id}`, data),
+    delete: (id) => api.delete(`/options/delete/${id}`),
 };
 
 export default optionService;
