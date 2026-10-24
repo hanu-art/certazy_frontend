@@ -50,8 +50,11 @@ export default function AdminLayout({ children }) {
     const user = useSelector(selectUser);
 
     const handleLogout = async () => {
-        await dispatch(logoutUser());
-        navigate("/");
+        try {
+            await dispatch(logoutUser());
+        } finally {
+            window.location.href = "/";
+        }
     };
 
     return (

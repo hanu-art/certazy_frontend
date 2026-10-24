@@ -17,15 +17,15 @@ import api from "./api";
  */
 
 const paymentService = {
-    getMyPayments: () => api.get("/v1/payments/history"),
+    getMyPayments: () => api.get("/payments/history"),
 
     // Razorpay
-    razorpayCreateOrder: (data) => api.post("/v1/payments/razorpay/create-order", data),
-    razorpayVerify:      (data) => api.post("/v1/payments/razorpay/verify",        data),
+    razorpayCreateOrder: (data) => api.post("/payments/razorpay/create-order", data),
+    razorpayVerify:      (data) => api.post("/payments/razorpay/verify",        data),
 
     // PayPal
-    paypalCreateOrder: (data) => api.post("/v1/payments/paypal/create-order", data),
-    paypalCapture:     (data) => api.post("/v1/payments/paypal/capture",       data),
+    paypalCreateOrder: (data) => api.post("/payments/paypal/create-order", data),
+    paypalCapture:     (data) => api.post("/payments/paypal/capture",       data),
 
     // Admin endpoints
     getAllPayments: (params = {}) => {
@@ -37,16 +37,16 @@ const paymentService = {
         if (params.limit) queryParams.append('limit', params.limit);
         if (params.currency) queryParams.append('currency', params.currency);
         
-        const url = `/v1/payments/admin/all${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+        const url = `/payments/admin/all${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
         return api.get(url);
     },
     
     getRecentPayments: (limit = 10) => {
-        return api.get(`/v1/payments/admin/all?limit=${limit}`);
+        return api.get(`/payments/admin/all?limit=${limit}`);
     },
 
     // Revenue stats
-    getRevenueStats: () => api.get("/v1/payments/admin/revenue"),
+    getRevenueStats: () => api.get("/payments/admin/revenue"),
 };
 
 export default paymentService;

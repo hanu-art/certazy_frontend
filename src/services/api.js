@@ -28,7 +28,7 @@ export const injectStore = (_store) => {
 // ── Request interceptor ───────────────────────────────────
 // Har request se pehle — access token header mein lagao
 api.interceptors.request.use(
-    (config) => { 
+    (config) => {
         if (injectedStore) {
             const token = injectedStore.getState().auth.accessToken;
             if (token) {
@@ -80,8 +80,8 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const { data } = await api.post("/v1/auth/refresh");
-                const newToken = data.data.accessToken;
+                const { data } = await api.post("/auth/refresh");
+                const newToken = data.data?.accessToken || data?.accessToken;
 
                 if (injectedStore) {
                     const { setToken } = await import("@/features/auth/authSlice");
@@ -99,8 +99,22 @@ api.interceptors.response.use(
                     const { clearAuth } = await import("@/features/auth/authSlice");
                     injectedStore.dispatch(clearAuth());
                 }
-                if (window.location.pathname !== "/login") {
-                    window.location.href = "/login";
+
+                // Do not redirect to /login during silent background hydration checks (/auth/me),
+                // while auth is initializing, or if already on an auth or public page.
+                const isHydrationCheck = originalRequest?.url?.includes('/auth/me');
+                const isInitializing = injectedStore?.getState()?.auth?.isInitializing;
+                const isAuthPage = window.location.pathname === "/login" ||
+                                   window.location.pathname === "/register" ||
+                                   window.location.pathname === "/oauth/callback";
+
+                if (!isHydrationCheck && !isInitializing && !isAuthPage) {
+                    const isProtected = window.location.pathname.startsWith('/admin') ||
+                                        window.location.pathname.startsWith('/student') ||
+                                        window.location.pathname.startsWith('/checkout');
+                    if (isProtected) {
+                        window.location.href = "/";
+                    }
                 }
                 return Promise.reject(refreshError);
 

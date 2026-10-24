@@ -14,16 +14,16 @@ import api from "./api";
 
 const attemptService = {
     // Test start karo
-    startAttempt: (testId) => api.post(`/v1/attempts/${testId}/start`),
+    startAttempt: (testId) => api.post(`/attempts/${testId}/start`),
 
     // Test submit karo
-    submitAttempt: (data) => api.post("/v1/attempts/submit", data),
+    submitAttempt: (data) => api.post("/attempts/submit", data),
 
     // Ek test ki attempt history
-    getAttemptHistory: (testId) => api.get(`/v1/attempts/${testId}/history`),
+    getAttemptHistory: (testId) => api.get(`/attempts/${testId}/history`),
 
     // Single attempt ka full detail (answers + explanations)
-    getAttemptDetail: (attemptId) => api.get(`/v1/attempts/${attemptId}/detail`),
+    getAttemptDetail: (attemptId) => api.get(`/attempts/${attemptId}/detail`),
 };
 
 export default attemptService;

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from '@/services/api';
 import uploadService from '@/services/uploadService';
 
 // Helper function for video upload workflow
@@ -28,13 +29,12 @@ export const uploadVideoAndCreateLesson = async (file, lessonData, adminToken) =
     await uploadPromise;
 
     // Step 3: Create lesson with the uploaded video URL
-    const lessonResponse = await axios.post('/api/v1/lessons/create', {
+    const config = adminToken ? { headers: { Authorization: `Bearer ${adminToken}` } } : {};
+    const lessonResponse = await api.post('/lessons/create', {
       ...lessonData,
       content: fileUrl, // Use the S3 URL from upload
       type: 'video'
-    }, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    });
+    }, config);
 
     return {
       success: true,

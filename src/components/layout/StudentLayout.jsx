@@ -39,8 +39,11 @@ export default function StudentLayout({ children }) {
     const user      = useSelector(selectUser);
 
     const handleLogout = async () => {
-        await dispatch(logoutUser());
-        navigate("/login");
+        try {
+            await dispatch(logoutUser());
+        } finally {
+            window.location.href = "/";
+        }
     };
 
     return (

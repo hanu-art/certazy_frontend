@@ -75,6 +75,7 @@ const authSlice = createSlice({
         isLoggedIn: false,
         isFirstLogin: false, // sub-admin force change password
         loading: false,
+        isInitializing: true, // Auth verification in progress on initial app boot
         error: null,
     },
 
@@ -92,6 +93,7 @@ const authSlice = createSlice({
             state.accessToken = accessToken;
             state.isLoggedIn = true;
             state.isFirstLogin = user.is_first_login ?? false;
+            state.isInitializing = false;
         },
 
         // Error clear karo
@@ -106,6 +108,7 @@ const authSlice = createSlice({
             state.isLoggedIn = false;
             state.isFirstLogin = false;
             state.loading = false;
+            state.isInitializing = false;
             state.error = null;
         },
     },
@@ -124,9 +127,11 @@ const authSlice = createSlice({
                 state.isLoggedIn = true;
                 state.isFirstLogin = user.is_first_login ?? false;
                 state.loading = false;
+                state.isInitializing = false;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
+                state.isInitializing = false;
                 state.error = action.payload;
             });
 
@@ -138,6 +143,7 @@ const authSlice = createSlice({
                 state.isLoggedIn = false;
                 state.isFirstLogin = false;
                 state.loading = false;
+                state.isInitializing = false;
                 state.error = null;
             })
             .addCase(logoutUser.rejected, (state) => {
@@ -145,6 +151,7 @@ const authSlice = createSlice({
                 state.user = null;
                 state.accessToken = null;
                 state.isLoggedIn = false;
+                state.isInitializing = false;
             });
 
         // ── Fetch Me ───────────────────────────
@@ -154,8 +161,12 @@ const authSlice = createSlice({
             })
             .addCase(fetchMe.fulfilled, (state, action) => {
                 state.user = action.payload.user;
+                if (action.payload.accessToken) {
+                    state.accessToken = action.payload.accessToken;
+                }
                 state.isLoggedIn = true;
                 state.loading = false;
+                state.isInitializing = false;
             })
             .addCase(fetchMe.rejected, (state) => {
                 // Token expired — state clear karo
@@ -163,6 +174,7 @@ const authSlice = createSlice({
                 state.accessToken = null;
                 state.isLoggedIn = false;
                 state.loading = false;
+                state.isInitializing = false;
             });
     },
 });
@@ -175,6 +187,7 @@ export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
 export const selectAccessToken = (state) => state.auth.accessToken;
 export const selectIsFirstLogin = (state) => state.auth.isFirstLogin;
 export const selectAuthLoading = (state) => state.auth.loading;
+export const selectIsInitializing = (state) => state.auth.isInitializing;
 export const selectAuthError = (state) => state.auth.error;
 
 export default authSlice.reducer;

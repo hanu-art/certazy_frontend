@@ -23,20 +23,20 @@ import api from "./api";
 
 const testService = {
     // Public
-    getByCourseId: (courseId) => api.get(`/v1/tests/course/${courseId}`),
-    getTestFull: (id) => api.get(`/v1/tests/${id}/full`),
-    getById: (id) => api.get(`/v1/tests/${id}`),
+    getByCourseId: (courseId) => api.get(`/tests/course/${courseId}`),
+    getTestFull: (id) => api.get(`/tests/${id}/full`),
+    getById: (id) => api.get(`/tests/${id}`),
 
     // Student - Updated to match API flow
-    startAttempt: (testId) => api.post(`/v1/attempts/${testId}/start`),
-    submitExam: (data) => api.post('/v1/attempts/submit', data),
-    getAttemptDetail: (attemptId) => api.get(`/v1/attempts/${attemptId}/detail`),
-    getStudentAttempts: (studentId) => api.get(`/v1/tests/attempts/student/${studentId}`),
+    startAttempt: (testId) => api.post(`/attempts/${testId}/start`),
+    submitExam: (data) => api.post('/attempts/submit', data),
+    getAttemptDetail: (attemptId) => api.get(`/attempts/${attemptId}/detail`),
+    getStudentAttempts: (studentId) => api.get(`/tests/attempts/student/${studentId}`),
 
     // Admin only
-    create: (data) => api.post("/v1/tests/create", data),
-    update: (id, data) => api.put(`/v1/tests/update/${id}`, data),
-    delete: (id) => api.delete(`/v1/tests/delete/${id}`),
+    create: (data) => api.post("/tests/create", data),
+    update: (id, data) => api.put(`/tests/update/${id}`, data),
+    delete: (id) => api.delete(`/tests/delete/${id}`),
 };
 
 export default testService;

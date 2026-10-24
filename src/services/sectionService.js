@@ -17,13 +17,13 @@ import api from "./api";
 
 const sectionService = {
     // Public
-    getByCourseId: (courseId) => api.get(`/v1/sections/course/${courseId}`),
-    getById: (id) => api.get(`/v1/sections/${id}`),
+    getByCourseId: (courseId) => api.get(`/sections/course/${courseId}`),
+    getById: (id) => api.get(`/sections/${id}`),
 
     // Admin only
-    create: (data) => api.post("/v1/sections/create", data),
-    update: (id, data) => api.put(`/v1/sections/update/${id}`, data),
-    delete: (id) => api.delete(`/v1/sections/delete/${id}`),
+    create: (data) => api.post("/sections/create", data),
+    update: (id, data) => api.put(`/sections/update/${id}`, data),
+    delete: (id) => api.delete(`/sections/delete/${id}`),
 };
 
 export default sectionService;
