@@ -18,12 +18,12 @@ import api from "./api";
 
 const contactService = {
   // Public
-  submit: (data) => api.post("/v1/contact/create", data),
+  submit: (data) => api.post("/contact/create", data),
 
   // Admin only
-  getAll: (params) => api.get("/v1/contact", { params }),       // ?status=new&page=1&limit=20
-  getById: (id) => api.get(`/v1/contact/${id}`),
-  updateStatus: (id, status) => api.put(`/v1/contact/${id}/status`, { status }),
+  getAll: (params) => api.get("/contact", { params }),       // ?status=new&page=1&limit=20
+  getById: (id) => api.get(`/contact/${id}`),
+  updateStatus: (id, status) => api.put(`/contact/${id}/status`, { status }),
 };
 
 export default contactService

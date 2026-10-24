@@ -15,11 +15,11 @@ import api from "./api";
  */
 
 const enrollmentService = {
-    // GET /v1/enrollments — student ke saare enrolled courses
-    getMyEnrollments: () => api.get("/v1/enrollments"),
+    // GET /enrollments — student ke saare enrolled courses
+    getMyEnrollments: () => api.get("/enrollments"),
 
-    // GET /v1/enrollments/:courseId — check if enrolled
-    checkEnrollment: (courseId) => api.get(`/v1/enrollments/${courseId}`),
+    // GET /enrollments/:courseId — check if enrolled
+    checkEnrollment: (courseId) => api.get(`/enrollments/${courseId}`),
 
     // Admin endpoints as specified
     getAllEnrollments: (params = {}) => {
@@ -30,12 +30,12 @@ const enrollmentService = {
         if (params.page) queryParams.append('page', params.page);
         if (params.limit) queryParams.append('limit', params.limit);
         
-        const url = `/v1/enrollments/admin/all${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+        const url = `/enrollments/admin/all${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
         return api.get(url);
     },
     
     getEnrollmentStats: () => {
-        return api.get("/v1/enrollments/admin/stats");
+        return api.get("/enrollments/admin/stats");
     },
 };
 

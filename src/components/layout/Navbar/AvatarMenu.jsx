@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useDispatch } from "react-redux";
 
@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
  */
 export default function AvatarMenu({ user }) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     // Initials from name — "Arjun Sharma" → "AS"
     const initials = user.name
@@ -38,9 +39,11 @@ export default function AvatarMenu({ user }) {
         .toUpperCase();
 
     const handleLogout = async () => {
-        await dispatch(logoutUser());
-        // authSlice logout ke baad state clear ho jaayegi
-        // Redirect AppRoutes ka ProtectedRoute handle karega
+        try {
+            await dispatch(logoutUser());
+        } finally {
+            window.location.href = "/";
+        }
     };
 
     return (

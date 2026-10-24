@@ -18,14 +18,14 @@ import api from "./api";
 
 const lessonService = {
     // Public
-    getBySectionId: (sectionId) => api.get(`/v1/lessons/section/${sectionId}`),
-    getFreeByCourseId: (courseId) => api.get(`/v1/lessons/free/course/${courseId}`),
-    getById: (id) => api.get(`/v1/lessons/${id}`),
+    getBySectionId: (sectionId) => api.get(`/lessons/section/${sectionId}`),
+    getFreeByCourseId: (courseId) => api.get(`/lessons/free/course/${courseId}`),
+    getById: (id) => api.get(`/lessons/${id}`),
 
     // Admin only
-    create: (data) => api.post("/v1/lessons/create", data),
-    update: (id, data) => api.put(`/v1/lessons/update/${id}`, data),
-    delete: (id) => api.delete(`/v1/lessons/delete/${id}`),
+    create: (data) => api.post("/lessons/create", data),
+    update: (id, data) => api.put(`/lessons/update/${id}`, data),
+    delete: (id) => api.delete(`/lessons/delete/${id}`),
 };
 
 export default lessonService;
